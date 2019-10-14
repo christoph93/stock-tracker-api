@@ -11,6 +11,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.ArrayList;
+
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 @SpringBootApplication
 public class StoncksApplication implements CommandLineRunner {
@@ -25,8 +27,23 @@ public class StoncksApplication implements CommandLineRunner {
     @Override
     public void run(String[] args) throws Exception {
 
+        ArrayList<String[]> table;
+        String line = "";
 
+        ExcelReader er = new ExcelReader();
 
+        System.out.println("Calling readFile");
+
+        table = er.findTableInFile("/home/mx/IdeaProjects/stoncks/transactions.xls");
+
+        for(String[] row : table){
+            line = "";
+            for(String s : row){
+                line += s + " ";
+            }
+            System.out.println(line);
+        }
+/*
         repository.deleteAll();
 
         // save a couple of customers
@@ -50,7 +67,7 @@ public class StoncksApplication implements CommandLineRunner {
         System.out.println("--------------------------------");
         for (Customer customer : repository.findByLastName("Smith")) {
             System.out.println(customer);
-        }
+        }*/
 
             /*
         System.out.println("Comments found with findAll():");
