@@ -13,7 +13,7 @@ public interface TransactionRepository extends MongoRepository<Transaction, Stri
 
         public Transaction findByTransactionID(String transID);
         public List<Transaction> findByCode(String code);
-        public List<Transaction> findByDate(Date date);
+        public List<Transaction> findByDate(String date);
 
     }
 

@@ -4,16 +4,17 @@ package com.stoncks.document;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.sql.Date;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.util.Date;
+
 
 @Document
 public class Transaction {
 
 
     @Id
-    private UUID transactionID;
-    private Date date;
+    private String id;
+    private String date;
     private String operation;
     private String code;
     private String description;
@@ -22,30 +23,21 @@ public class Transaction {
     private double totalPrice;
 
 
-    public Transaction(Date date, String operation, String code, String description, double quantity, double price) {
+    public Transaction(String date, String operation, String code, String description, double quantity, double price, double totalPrice) {
         this.date = date;
         this.operation = operation;
         this.code = code;
         this.description = description;
         this.quantity = quantity;
         this.price = price;
-        this.transactionID = UUID.randomUUID();
+        this.totalPrice = totalPrice;
     }
 
-    public UUID getTransactionID() {
-        return transactionID;
-    }
-
-
-    public void setTransactionID(UUID transactionID) {
-        this.transactionID = transactionID;
-    }
-
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
@@ -100,7 +92,7 @@ public class Transaction {
     @Override
     public String toString() {
         return "transaction{" +
-                "transactionID=" + transactionID.toString() +
+                "transactionID=" + id.toString() +
                 ", date=" + date +
                 ", operation='" + operation + '\'' +
                 ", code='" + code + '\'' +
