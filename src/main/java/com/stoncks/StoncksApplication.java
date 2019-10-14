@@ -47,14 +47,14 @@ public class StoncksApplication implements CommandLineRunner {
         System.out.println("Calling readFile");
 
         table = er.findTableInFile("/home/mx/IdeaProjects/stoncks/transactions.xls");
-
+/*
         for(String[] row : table){
             line = "";
             for(String s : row){
                 line += s + " ";
             }
             System.out.println(line);
-        }
+        }*/
 
         //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
 
@@ -73,6 +73,13 @@ public class StoncksApplication implements CommandLineRunner {
 
         repository.deleteAll();
         repository.saveAll(transactions);
+
+
+        System.out.println("Transactions found with findAll():");
+        System.out.println("-------------------------------");
+        for (Transaction t : repository.findAll()) {
+            System.out.println(t);
+        }
 
 /*        repository.deleteAll();
 
