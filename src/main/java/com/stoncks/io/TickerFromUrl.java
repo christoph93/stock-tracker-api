@@ -2,6 +2,7 @@ package com.stoncks.io;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stoncks.document.Ticker;
 import org.apache.poi.util.ReplacingInputStream;
 
 import java.io.BufferedReader;
@@ -13,7 +14,7 @@ import java.net.*;
 public class TickerFromUrl {
 
 
-    public JsonNode tickerDaily(String symbol) {
+    public Ticker tickerDaily(String symbol) {
 
         String apiKey = "N6UZN5PBXVO599CV";
 
@@ -61,17 +62,15 @@ public class TickerFromUrl {
                 sb.append(output.replace(". ", " "));
             }
 
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode jsonNode = mapper.readTree(sb.toString());
-
+            //ObjectMapper mapper = new ObjectMapper();
+            //JsonNode jsonNode = mapper.readTree(sb.toString());
 
 
             //System.out.println(jsonNode.toPrettyString());
 
             conn.disconnect();
-
-            return jsonNode;
-
+            //return new Ticker(jsonNode, System.currentTimeMillis());
+            return new Ticker(sb.toString(), System.currentTimeMillis());
         } catch (MalformedURLException e) {
 
             e.printStackTrace();

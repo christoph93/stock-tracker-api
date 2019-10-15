@@ -7,6 +7,7 @@ import com.stoncks.io.TickerFromUrl;
 import com.stoncks.repository.TickerRepository;
 import com.stoncks.repository.TransactionRepository;
 import com.stoncks.io.ExcelReader;
+import com.stoncks.service.TickerUpdater;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 @SpringBootApplication
@@ -22,6 +24,7 @@ public class StoncksApplication implements CommandLineRunner {
 
     @Autowired
     private TransactionRepository transactionRepository;
+
     @Autowired
     private TickerRepository tickerRepository;
 
@@ -32,21 +35,31 @@ public class StoncksApplication implements CommandLineRunner {
     @Override
     public void run(String[] args) throws Exception {
 
-        /*
+        TickerFromUrl tfu = new TickerFromUrl();
+        tickerRepository.deleteAll();
+        tickerRepository.save(tfu.tickerDaily("PETR4.SAO"));
+
+
+        List<Ticker> tickers = tickerRepository.findAll();
+
+        for(Ticker t : tickers) {
+            System.out.println(t.updateSymbol());
+        }
+
+
+
+        /*for(Ticker ticker : tickerRepository.findAll()){
+            System.out.println(ticker.getContent().toPrettyString());
+        }*/
+
+
+/*
         saveToMongo(
         readExcel("/home/mx/IdeaProjects/stoncks/transactions.xls")
-        );
-         */
-
-
-        TickerFromUrl ticker = new TickerFromUrl();
-        JsonNode tickerAsJson = ticker.tickerDaily("PETR4.SAO");
-        Ticker t = new Ticker(tickerAsJson);
-
-        tickerRepository.deleteAll();
-        tickerRepository.save(t);
-
-        System.out.println(tickerAsJson.toPrettyString());
+        );*/
+/*
+        TickerUpdater tu = new TickerUpdater();
+        tu.updateFromTransactions(transactionRepository, tickerRepository, 5);*/
     }
 
 

@@ -4,8 +4,6 @@ package com.stoncks.document;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
-import java.util.Date;
 
 
 @Document
@@ -16,7 +14,7 @@ public class Transaction {
     private String id;
     private String date;
     private String operation;
-    private String code;
+    private String symbol;
     private String description;
     private double quantity;
     private double price;
@@ -24,16 +22,19 @@ public class Transaction {
     private long createDate;
 
 
-    public Transaction(String date, String operation, String code, String description, double quantity, double price, double totalPrice, long createDate) {
+    public Transaction(String date, String operation, String symbol, String description, double quantity, double price, double totalPrice, long createDate) {
         this.date = date;
         this.operation = operation;
-        this.code = code;
+        this.symbol = symbol;
         this.description = description;
         this.quantity = quantity;
         this.price = price;
         this.totalPrice = totalPrice;
         this.createDate = createDate;
+    }
 
+    public String getId() {
+        return id;
     }
 
     public long getCreateDate() {
@@ -60,12 +61,12 @@ public class Transaction {
         this.operation = operation;
     }
 
-    public String getCode() {
-        return code;
+    public String getSymbol() {
+        return symbol;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
 
     public String getDescription() {
@@ -106,7 +107,7 @@ public class Transaction {
                 "id='" + id + '\'' +
                 ", date='" + date + '\'' +
                 ", operation='" + operation + '\'' +
-                ", code='" + code + '\'' +
+                ", code='" + symbol + '\'' +
                 ", description='" + description + '\'' +
                 ", quantity=" + quantity +
                 ", price=" + price +
