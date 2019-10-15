@@ -21,9 +21,10 @@ public class Transaction {
     private double quantity;
     private double price;
     private double totalPrice;
+    private long createDate;
 
 
-    public Transaction(String date, String operation, String code, String description, double quantity, double price, double totalPrice) {
+    public Transaction(String date, String operation, String code, String description, double quantity, double price, double totalPrice, long createDate) {
         this.date = date;
         this.operation = operation;
         this.code = code;
@@ -31,6 +32,16 @@ public class Transaction {
         this.quantity = quantity;
         this.price = price;
         this.totalPrice = totalPrice;
+        this.createDate = createDate;
+
+    }
+
+    public long getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(long createDate) {
+        this.createDate = createDate;
     }
 
     public String getDate() {
@@ -91,15 +102,16 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return "transaction{" +
-                "transactionID=" + id.toString() +
-                ", date=" + date +
+        return "Transaction{" +
+                "id='" + id + '\'' +
+                ", date='" + date + '\'' +
                 ", operation='" + operation + '\'' +
                 ", code='" + code + '\'' +
                 ", description='" + description + '\'' +
                 ", quantity=" + quantity +
                 ", price=" + price +
                 ", totalPrice=" + totalPrice +
+                ", createDate=" + createDate +
                 '}';
     }
 }
