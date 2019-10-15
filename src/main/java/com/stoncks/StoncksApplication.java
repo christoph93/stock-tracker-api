@@ -1,7 +1,10 @@
 package com.stoncks;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.stoncks.document.Ticker;
 import com.stoncks.document.Transaction;
 import com.stoncks.io.TickerFromUrl;
+import com.stoncks.repository.TickerRepository;
 import com.stoncks.repository.TransactionRepository;
 import com.stoncks.io.ExcelReader;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -18,7 +21,9 @@ import java.util.ArrayList;
 public class StoncksApplication implements CommandLineRunner {
 
     @Autowired
-    private TransactionRepository repository;
+    private TransactionRepository transactionRepository;
+    @Autowired
+    private TickerRepository tickerRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(StoncksApplication.class, args);
@@ -35,9 +40,16 @@ public class StoncksApplication implements CommandLineRunner {
 
 
         TickerFromUrl ticker = new TickerFromUrl();
-        ticker.readURL("TIME_SERIES_DAILY", "PETR4.SAO");
+        JsonNode tickerAsJson = ticker.tickerDaily("PETR4.SAO");
+        Ticker t = new Ticker(tickerAsJson);
 
+        tickerRepository.deleteAll();
+        tickerRepository.save(t);
+
+        System.out.println(tickerAsJson.toPrettyString());
     }
+
+
 
 
     public ArrayList<Transaction> readExcel(String path){
@@ -81,13 +93,13 @@ public class StoncksApplication implements CommandLineRunner {
     public void saveToMongo(ArrayList<Transaction> transactions){
 
 
-        repository.deleteAll();
-        repository.saveAll(transactions);
+        transactionRepository.deleteAll();
+        transactionRepository.saveAll(transactions);
 
 
         System.out.println("Transactions found with findAll():");
         System.out.println("-------------------------------");
-        for (Transaction t : repository.findAll()) {
+        for (Transaction t : transactionRepository.findAll()) {
             System.out.println(t);
         }
 
