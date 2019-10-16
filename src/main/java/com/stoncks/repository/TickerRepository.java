@@ -8,5 +8,8 @@ import java.util.List;
 public interface TickerRepository extends MongoRepository<Ticker, String>{
 
 
+    List<Ticker> findBySymbol(String symbol);
+    List<Ticker> deleteBySymbol(String symbol);
+
 
 }

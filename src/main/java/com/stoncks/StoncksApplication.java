@@ -34,24 +34,16 @@ public class StoncksApplication implements CommandLineRunner {
 
     @Override
     public void run(String[] args) throws Exception {
-
+/*
         TickerFromUrl tfu = new TickerFromUrl();
         tickerRepository.deleteAll();
         tickerRepository.save(tfu.tickerDaily("PETR4.SAO"));
 
+ */
 
-        List<Ticker> tickers = tickerRepository.findAll();
+        TickerUpdater tu = new TickerUpdater();
 
-        for(Ticker t : tickers) {
-            System.out.println(t.updateSymbol());
-        }
-
-
-
-        /*for(Ticker ticker : tickerRepository.findAll()){
-            System.out.println(ticker.getContent().toPrettyString());
-        }*/
-
+        tu.updateFromTransactions(transactionRepository, tickerRepository, 5);
 
 /*
         saveToMongo(

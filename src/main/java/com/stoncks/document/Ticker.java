@@ -1,12 +1,10 @@
 package com.stoncks.document;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Document
@@ -16,10 +14,10 @@ public class Ticker {
     private String id;
 
     private String content;
-    private long createDate;
+    private Long createDate;
     private String symbol;
 
-    public Ticker(String content, long createDate) {
+    public Ticker(String content, Long createDate) {
         this.content = content;
         this.createDate = createDate;
         this.symbol = updateSymbol();
@@ -35,11 +33,7 @@ public class Ticker {
         ObjectMapper mapper = new ObjectMapper();
         try {
             Map<String, Object> map = mapper.readValue(content, Map.class);
-            System.out.println(map);
-
-
             Map<String, Object> meta = (Map<String, Object>) map.get("Meta Data");
-            System.out.println(meta);
             String s = (String) meta.get("2 Symbol");
 
             return s;
@@ -47,7 +41,6 @@ public class Ticker {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-
 
         return "ERROR";
     }
@@ -64,11 +57,11 @@ public class Ticker {
         this.content = content;
     }
 
-    public long getCreateDate() {
+    public Long getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(long createDate) {
+    public void setCreateDate(Long createDate) {
         this.createDate = createDate;
     }
 

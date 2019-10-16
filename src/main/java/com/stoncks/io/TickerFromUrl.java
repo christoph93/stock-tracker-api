@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.util.Date;
 
 public class TickerFromUrl {
 
@@ -58,7 +59,10 @@ public class TickerFromUrl {
             String output;
             StringBuilder sb = new StringBuilder();
 
+            boolean hasMetaData = false;
+
             while ((output = br.readLine()) != null) {
+                if(output.contains("Meta Data")) hasMetaData = true;
                 sb.append(output.replace(". ", " "));
             }
 
@@ -70,7 +74,14 @@ public class TickerFromUrl {
 
             conn.disconnect();
             //return new Ticker(jsonNode, System.currentTimeMillis());
-            return new Ticker(sb.toString(), System.currentTimeMillis());
+
+            if(hasMetaData) return new Ticker(sb.toString(), System.currentTimeMillis());
+
+            System.out.println("Response did not contain Meta Data!");
+            System.out.println(sb.toString());
+
+            return null;
+
         } catch (MalformedURLException e) {
 
             e.printStackTrace();
