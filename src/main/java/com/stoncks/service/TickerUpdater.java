@@ -15,19 +15,38 @@ import java.util.List;
 public class TickerUpdater {
 
 
-    public void updateFromTransactions(TransactionRepository transactionRepository, TickerRepository tickerRepository, int limitPerMin) throws InterruptedException {
+    public void updateFromTransactions(TransactionRepository transactionRepository, TickerRepository tickerRepository, int limitPerMin, String allOrMissing) throws InterruptedException {
 
         long firstReq = 0;
         int reqCount = 0;
         long intervalInSec;
 
         List<Transaction> transactions = transactionRepository.findAll();
+        List<Ticker> existingTickers = tickerRepository.findAll();
 
 
         HashSet<String> symbols = new HashSet<>();
 
-        for(Transaction t : transactions){
-            symbols.add(t.getSymbol());
+        HashSet<String> existingSymbols = new HashSet<>();
+
+        for(Ticker t : existingTickers){
+            existingSymbols.add(t.getSymbol());
+        }
+
+        if(allOrMissing.equals("MISSING")){
+            System.out.println("Missing Symbols: ");
+            //pull only missing tickers
+            for (Transaction t : transactions) {
+                if(!existingSymbols.contains(t.getSymbol()+".SAO")) {
+                    symbols.add(t.getSymbol());
+                }
+            }
+            System.out.println(symbols.toString());
+
+        } else {
+            for (Transaction t : transactions) {
+                symbols.add(t.getSymbol());
+            }
         }
 
         System.out.println("Symbols to update");

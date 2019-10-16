@@ -43,7 +43,7 @@ public class StoncksApplication implements CommandLineRunner {
 
         TickerUpdater tu = new TickerUpdater();
 
-        tu.updateFromTransactions(transactionRepository, tickerRepository, 5);
+        tu.updateFromTransactions(transactionRepository, tickerRepository, 5, "ALL");
 
 /*
         saveToMongo(
