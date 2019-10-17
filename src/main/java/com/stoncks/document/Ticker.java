@@ -1,11 +1,9 @@
 package com.stoncks.document;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Map;
+import java.util.Date;
 
 @Document
 public class Ticker {
@@ -13,14 +11,14 @@ public class Ticker {
     @Id
     private String id;
 
-    private String content;
-    private Long createDate;
+    private Object content;
+    private Date createDate;
     private String symbol;
 
-    public Ticker(String content, Long createDate) {
+    public Ticker(Object content, Date createDate, String symbol) {
         this.content = content;
         this.createDate = createDate;
-        this.symbol = updateSymbol();
+        this.symbol = symbol;
     }
 
     public Ticker(){
@@ -30,11 +28,12 @@ public class Ticker {
 
     public String updateSymbol(){
 
+        /*
         ObjectMapper mapper = new ObjectMapper();
         try {
-            Map<String, Object> map = mapper.readValue(content, Map.class);
+            Map map = mapper.readValue(content, Map.class);
             Map<String, Object> meta = (Map<String, Object>) map.get("Meta Data");
-            String s = (String) meta.get("2 Symbol");
+            String s = (String) meta.get("2. Symbol");
 
             return s;
 
@@ -42,26 +41,27 @@ public class Ticker {
             e.printStackTrace();
         }
 
-        return "ERROR";
+        return "ERROR";*/
+        return "TEST";
     }
 
     public String getId() {
         return id;
     }
 
-    public String getContent() {
+    public Object getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(Object content) {
         this.content = content;
     }
 
-    public Long getCreateDate() {
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Long createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 

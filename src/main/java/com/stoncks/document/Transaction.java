@@ -4,6 +4,7 @@ package com.stoncks.document;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
 
 
 @Document
@@ -12,45 +13,45 @@ public class Transaction {
 
     @Id
     private String id;
-    private String date;
+    private Date transactionDate;
     private String operation;
     private String symbol;
     private String description;
     private double quantity;
     private double price;
     private double totalPrice;
-    private long createDate;
+    private Date recordCreateDate;
 
 
-    public Transaction(String date, String operation, String symbol, String description, double quantity, double price, double totalPrice, long createDate) {
-        this.date = date;
+    public Transaction(Date transactionDate, String operation, String symbol, String description, double quantity, double price, double totalPrice, Date recordCreateDate) {
+        this.transactionDate = transactionDate;
         this.operation = operation;
         this.symbol = symbol;
         this.description = description;
         this.quantity = quantity;
         this.price = price;
         this.totalPrice = totalPrice;
-        this.createDate = createDate;
+        this.recordCreateDate = recordCreateDate;
     }
 
     public String getId() {
         return id;
     }
 
-    public long getCreateDate() {
-        return createDate;
+    public Date getRecordCreateDate() {
+        return recordCreateDate;
     }
 
-    public void setCreateDate(long createDate) {
-        this.createDate = createDate;
+    public void setRecordCreateDate(Date recordCreateDate) {
+        this.recordCreateDate = recordCreateDate;
     }
 
-    public String getDate() {
-        return date;
+    public Date getTransactionDate() {
+        return transactionDate;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setTransactionDate(Date transactionDate) {
+        this.transactionDate = transactionDate;
     }
 
     public String getOperation() {
@@ -105,14 +106,14 @@ public class Transaction {
     public String toString() {
         return "Transaction{" +
                 "id='" + id + '\'' +
-                ", date='" + date + '\'' +
+                ", date='" + transactionDate + '\'' +
                 ", operation='" + operation + '\'' +
                 ", code='" + symbol + '\'' +
                 ", description='" + description + '\'' +
                 ", quantity=" + quantity +
                 ", price=" + price +
                 ", totalPrice=" + totalPrice +
-                ", createDate=" + createDate +
+                ", createDate=" + recordCreateDate +
                 '}';
     }
 }

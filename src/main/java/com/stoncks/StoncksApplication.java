@@ -1,9 +1,10 @@
 package com.stoncks;
 
-import com.fasterxml.jackson.databind.JsonNode;
+
 import com.stoncks.document.Ticker;
 import com.stoncks.document.Transaction;
-import com.stoncks.io.TickerFromUrl;
+
+import com.stoncks.io.PriceReader;
 import com.stoncks.repository.TickerRepository;
 import com.stoncks.repository.TransactionRepository;
 import com.stoncks.io.ExcelReader;
@@ -15,8 +16,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
+import java.util.Locale;
 
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 @SpringBootApplication
@@ -34,30 +39,42 @@ public class StoncksApplication implements CommandLineRunner {
 
     @Override
     public void run(String[] args) throws Exception {
-/*
-        TickerFromUrl tfu = new TickerFromUrl();
-        tickerRepository.deleteAll();
-        tickerRepository.save(tfu.tickerDaily("PETR4.SAO"));
 
- */
+        //Upload transactions to mongodb
 
-        TickerUpdater tu = new TickerUpdater();
+        //saveToMongo(readExcel("/home/mx/IdeaProjects/stoncks/transactions.xls"));
 
-        tu.updateFromTransactions(transactionRepository, tickerRepository, 5, "ALL");
 
-/*
-        saveToMongo(
-        readExcel("/home/mx/IdeaProjects/stoncks/transactions.xls")
-        );*/
-/*
-        TickerUpdater tu = new TickerUpdater();
-        tu.updateFromTransactions(transactionRepository, tickerRepository, 5);*/
+        //Start thread to update symbols
+        Thread t1 = new Thread(new TickerUpdater(transactionRepository, tickerRepository, 5, true));
+        t1.start();
+
+        PriceReader priceReader;
+
+        for(Ticker ticker : tickerRepository.findAll()){
+            priceReader = new PriceReader(ticker);
+
+            for(String s : priceReader.getTimeSeries().keySet()){
+                System.out.println(
+                        ticker.getSymbol() + " " +
+                                s + " " +
+                        priceReader.getPrice(s, "4. close")
+                );
+            }
+
+
+        }
+
+
+
+
+
     }
 
 
 
 
-    public ArrayList<Transaction> readExcel(String path){
+    public ArrayList<Transaction> readExcel(String path) throws ParseException {
         ArrayList<String[]> table;
         String line = "";
         ArrayList<Transaction> transactions = new ArrayList<>();
@@ -76,17 +93,20 @@ public class StoncksApplication implements CommandLineRunner {
             System.out.println(line);
         }*/
 
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy", Locale.ENGLISH);
+
+        //table.get(i)[0].trim()
 
         for(int i = 1; i < table.size(); i++){
             transactions.add(new Transaction(
-                    table.get(i)[0].trim(),
+                    formatter.parse(table.get(i)[0].trim()),
                     table.get(i)[2].trim(),
                     table.get(i)[5].trim(),
                     table.get(i)[6].trim(),
                     Double.parseDouble(table.get(i)[7]),
                     Double.parseDouble(table.get(i)[8]),
                     Double.parseDouble(table.get(i)[9]),
-                    System.currentTimeMillis()
+                    Date.from(Instant.now())
             ));
         }
 
@@ -101,44 +121,11 @@ public class StoncksApplication implements CommandLineRunner {
         transactionRepository.deleteAll();
         transactionRepository.saveAll(transactions);
 
+        System.out.println("Saved the following transactions");
 
-        System.out.println("Transactions found with findAll():");
-        System.out.println("-------------------------------");
         for (Transaction t : transactionRepository.findAll()) {
             System.out.println(t);
         }
-
-/*        repository.deleteAll();
-
-        // save a couple of customers
-        repository.save(new Customer("Alice", "Smith"));
-        repository.save(new Customer("Bob", "Smith"));
-
-        // fetch all customers
-        System.out.println("Customers found with findAll():");
-        System.out.println("-------------------------------");
-        for (Customer customer : repository.findAll()) {
-            System.out.println(customer);
-        }
-        System.out.println();
-
-        // fetch an individual customer
-        System.out.println("Customer found with findByFirstName('Alice'):");
-        System.out.println("--------------------------------");
-        System.out.println(repository.findByFirstName("Alice"));
-
-        System.out.println("Customers found with findByLastName('Smith'):");
-        System.out.println("--------------------------------");
-        for (Customer customer : repository.findByLastName("Smith")) {
-            System.out.println(customer);
-        }*/
-
-            /*
-        System.out.println("Comments found with findAll():");
-        System.out.println("-------------------------------");
-        for (Comments c : repository.findAll()) {
-            System.out.println(c);
-        } */
     }
 
 

@@ -1,16 +1,15 @@
 package com.stoncks.io;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.stoncks.document.Ticker;
-import org.apache.poi.util.ReplacingInputStream;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+
 import java.io.InputStreamReader;
 import java.net.*;
-import java.util.Date;
+import java.sql.Date;
+import java.time.Instant;
 
 public class TickerFromUrl {
 
@@ -54,37 +53,20 @@ public class TickerFromUrl {
             }
 
             InputStreamReader inr = new InputStreamReader(conn.getInputStream());
-            BufferedReader br = new BufferedReader(inr);
 
-            String output;
-            StringBuilder sb = new StringBuilder();
+            JsonObject jsonObject = new Gson().fromJson(inr, JsonObject.class);
 
-            boolean hasMetaData = false;
+            Object object = new Gson().fromJson(jsonObject.toString(), Object.class);
 
-            while ((output = br.readLine()) != null) {
-                if(output.contains("Meta Data")) hasMetaData = true;
-                sb.append(output.replace(". ", " "));
+
+            if(!jsonObject.has("Meta Data")){
+                System.out.println("Response did not contain Meta Data!");
+            } else {
+                return new Ticker(object, Date.from(Instant.now()), symbol);
             }
-
-            //ObjectMapper mapper = new ObjectMapper();
-            //JsonNode jsonNode = mapper.readTree(sb.toString());
-
-
-            //System.out.println(jsonNode.toPrettyString());
-
             conn.disconnect();
-            //return new Ticker(jsonNode, System.currentTimeMillis());
-
-            if(hasMetaData) return new Ticker(sb.toString(), System.currentTimeMillis());
-
-            System.out.println("Response did not contain Meta Data!");
-            System.out.println(sb.toString());
 
             return null;
-
-        } catch (MalformedURLException e) {
-
-            e.printStackTrace();
 
         } catch (IOException e) {
 
@@ -92,7 +74,7 @@ public class TickerFromUrl {
 
         }
 
-            return null;
+        return null;
 
     }
 
