@@ -1,10 +1,13 @@
 package com.stoncks;
 
 
+import com.stoncks.document.Portfolio;
 import com.stoncks.document.Ticker;
 import com.stoncks.document.Transaction;
 
+import com.stoncks.io.PortfolioManager;
 import com.stoncks.io.PriceReader;
+import com.stoncks.repository.PortfolioRepository;
 import com.stoncks.repository.TickerRepository;
 import com.stoncks.repository.TransactionRepository;
 import com.stoncks.io.ExcelReader;
@@ -19,9 +22,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 @SpringBootApplication
@@ -32,6 +33,9 @@ public class StoncksApplication implements CommandLineRunner {
 
     @Autowired
     private TickerRepository tickerRepository;
+
+    @Autowired
+    private PortfolioRepository portfolioRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(StoncksApplication.class, args);
@@ -46,7 +50,7 @@ public class StoncksApplication implements CommandLineRunner {
 
 
         //Start thread to update symbols
-        Thread t1 = new Thread(new TickerUpdater(transactionRepository, tickerRepository, 5, true));
+        /*Thread t1 = new Thread(new TickerUpdater(transactionRepository, tickerRepository, 5, true));
         t1.start();
 
         PriceReader priceReader;
@@ -58,12 +62,35 @@ public class StoncksApplication implements CommandLineRunner {
                 System.out.println(
                         ticker.getSymbol() + " " +
                                 s + " " +
-                        priceReader.getPrice(s, "4. close")
+                        priceReader.getPriceByDate(s, "4. close")
                 );
             }
+        }*/
 
 
-        }
+        portfolioRepository.deleteAll();
+
+        //create portfolio
+        portfolioRepository.save(new Portfolio("MyPortfolio", new String[]{"LEVE3.SAO", "VALE3.SAO"}, "MyOwner"));
+
+        //Update portfolio
+        PortfolioManager portfolioManager = new PortfolioManager(portfolioRepository);
+
+        //add a symbol
+        System.out.println(Arrays.toString(portfolioManager.addSymbol("MyPortfolio", "MyOwner", "AEFI11.SAO")));
+        //remove a symbol
+        System.out.println(Arrays.toString(portfolioManager.removeSymbol("MyPortfolio", "MyOwner", "LEVE3.SAO")));
+        //remove all symbols
+        System.out.println(portfolioManager.removeAllSymbols("MyPortfolio", "MyOwner"));
+        //add symbols as list
+        System.out.println(Arrays.toString(portfolioManager.addSymbols("MyPortfolio", "MyOwner",Arrays.asList("POMO3.SAO", "USIM3.SAO"))));
+        System.out.println(Arrays.toString(portfolioManager.addSymbols("MyPortfolio", "MyOwner",Arrays.asList("POMO3.SAO", "USIM3.SAO"))));
+        System.out.println(Arrays.toString(portfolioManager.addSymbols("MyPortfolio", "MyOwner",Arrays.asList("ITSA4.SAO", "TIET11.SAO"))));
+        //update name
+        System.out.println(portfolioManager.updateName("MyPortfolio", "MyOwner", "MyNewPortfolio"));
+        //update owner
+        System.out.println(portfolioManager.updateName("MyNewPortfolio", "MyOwner", "MyNewOwner"));
+
 
 
 

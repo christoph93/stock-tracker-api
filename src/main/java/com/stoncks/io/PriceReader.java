@@ -31,7 +31,7 @@ public class PriceReader {
 
     }
 
-    public double getPrice (String date, String type){
+    public double getPriceByDate(String date, String type){
         JsonObject prices = this.timeSeries.get(date).getAsJsonObject();
 
         return Double.parseDouble(prices.get(type).getAsString());
