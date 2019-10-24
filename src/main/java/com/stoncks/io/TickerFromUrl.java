@@ -13,13 +13,19 @@ import java.time.Instant;
 
 public class TickerFromUrl {
 
+    private String apiKey;
+    private String timeSerires;
 
-    public Ticker tickerDaily(String symbol) {
+    public TickerFromUrl (String timeSeries, String apiKey){
+        this.apiKey = apiKey;
+        this.timeSerires = timeSeries;
+    }
 
-        String apiKey = "N6UZN5PBXVO599CV";
+
+    public Ticker getTicker(String symbol, String outputSize) {
 
         ////https://www.alphavantage.co/query?function=${json.apiFunction}&symbol=${json.symbol}&interval=${json.interval}&apikey=${conf.apiKey}
-        String urlString = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + symbol + "&apikey=" + apiKey;
+        String urlString = "https://www.alphavantage.co/query?function="+ timeSerires + "&symbol=" + symbol + "&outputsize=" + outputSize + "&apikey=" + apiKey;
         System.out.println(urlString);
 
         Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("websurfing1-htl1.esi.adp.com", Integer.parseInt("8080")));

@@ -24,27 +24,6 @@ public class Ticker {
     public Ticker(){
 
     }
-
-
-    public String updateSymbol(){
-
-        /*
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            Map map = mapper.readValue(content, Map.class);
-            Map<String, Object> meta = (Map<String, Object>) map.get("Meta Data");
-            String s = (String) meta.get("2. Symbol");
-
-            return s;
-
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-        return "ERROR";*/
-        return "TEST";
-    }
-
     public String getId() {
         return id;
     }

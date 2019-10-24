@@ -41,6 +41,8 @@ public class StoncksApplication implements CommandLineRunner {
         SpringApplication.run(StoncksApplication.class, args);
     }
 
+    public static String API_KEY =  "N6UZN5PBXVO599CV";
+
     @Override
     public void run(String[] args) throws Exception {
 
@@ -50,9 +52,14 @@ public class StoncksApplication implements CommandLineRunner {
 
 
         //Start thread to update symbols
-        /*Thread t1 = new Thread(new TickerUpdater(transactionRepository, tickerRepository, 5, true));
+        int daysOutdated = 1;
+
+        System.out.println("Updating Tickers outdated by " + daysOutdated + " days");
+        Thread t1 = new Thread(new TickerUpdater(transactionRepository, tickerRepository, 5, false, daysOutdated));
         t1.start();
 
+
+        /*
         PriceReader priceReader;
 
         for(Ticker ticker : tickerRepository.findAll()){
@@ -67,7 +74,7 @@ public class StoncksApplication implements CommandLineRunner {
             }
         }*/
 
-
+/*
         portfolioRepository.deleteAll();
 
         //create portfolio
@@ -90,7 +97,7 @@ public class StoncksApplication implements CommandLineRunner {
         System.out.println(portfolioManager.updateName("MyPortfolio", "MyOwner", "MyNewPortfolio"));
         //update owner
         System.out.println(portfolioManager.updateName("MyNewPortfolio", "MyOwner", "MyNewOwner"));
-
+*/
 
 
 

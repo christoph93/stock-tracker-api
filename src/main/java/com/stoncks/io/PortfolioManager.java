@@ -3,7 +3,6 @@ package com.stoncks.io;
 import com.stoncks.document.Portfolio;
 import com.stoncks.repository.PortfolioRepository;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
