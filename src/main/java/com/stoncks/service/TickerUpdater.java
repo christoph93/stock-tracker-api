@@ -22,30 +22,22 @@ public class TickerUpdater implements Runnable {
     private TickerRepository tickerRepository;
     private int reqLimitPerMin;
     private boolean onlyMissingSymbols;
-    private Date createdBeforeDate;
 
-
-    public TickerUpdater(TransactionRepository transactionRepository, TickerRepository tickerRepository, int reqLimitPerMin, boolean onlyMissingSymbols, int daysOutdated){
+    public TickerUpdater(TransactionRepository transactionRepository, TickerRepository tickerRepository, int reqLimitPerMin, boolean onlyMissingSymbols){
         this.tickerRepository = tickerRepository;
         this.transactionRepository = transactionRepository;
         this.reqLimitPerMin = reqLimitPerMin;
         this.onlyMissingSymbols = onlyMissingSymbols;
-        this.createdBeforeDate = Date.from(Instant.now().minus(daysOutdated, DAYS));
     }
 
 
     private String[] getMissingSymbolsFromTransactions(){
         String[] allSymbols = getAllSymbolsFromTransactions();
-        List<Ticker> existingTickersToUpdate = tickerRepository.findByCreateDateBefore(createdBeforeDate);
-
-        for(Ticker t  : existingTickersToUpdate){
-            System.out.println(t.getSymbol() + " " + t.getCreateDate());
-        }
-
+        List<Ticker> existingTickers = tickerRepository.findAll();
         HashSet<String> existingSymbols = new HashSet<>();
         HashSet<String> missingSymbols = new HashSet<>();
 
-        for(Ticker t : existingTickersToUpdate){
+        for(Ticker t : existingTickers){
             existingSymbols.add(t.getSymbol());
         }
 
@@ -59,16 +51,10 @@ public class TickerUpdater implements Runnable {
 
     private String[] getAllSymbolsFromTransactions(){
         List<Transaction> transactions = transactionRepository.findAll();
-        List<Ticker> tickersNotToUpdate = tickerRepository.findByCreateDateAfter(this.createdBeforeDate);
         HashSet<String> symbolsFromTrans = new HashSet<>();
-        HashSet<String> updatedSymbols = new HashSet<>();
 
         for (Transaction t : transactions) {
             symbolsFromTrans.add(t.getSymbol() + ".SAO");
-        }
-
-        for(Ticker t : tickersNotToUpdate){
-            updatedSymbols.add(t.getSymbol());
         }
 
         return Arrays.copyOf(symbolsFromTrans.toArray(), symbolsFromTrans.toArray().length, String[].class);
@@ -83,7 +69,7 @@ public class TickerUpdater implements Runnable {
         String[] symbolsToUpdate = (onlyMissingSymbols ? getMissingSymbolsFromTransactions() : getAllSymbolsFromTransactions());
 
         System.out.println(
-                (onlyMissingSymbols ? "Updating missing symbols:" : "Updating all symbols updated before " + createdBeforeDate)
+                (onlyMissingSymbols ? "Updating missing symbols:" : "Updating all symbols")
         );
 
         System.out.println(Arrays.toString(symbolsToUpdate));

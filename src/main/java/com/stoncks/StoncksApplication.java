@@ -49,13 +49,7 @@ public class StoncksApplication implements CommandLineRunner {
         //Upload transactions to mongodb
 
         //saveToMongo(readExcel("/home/mx/IdeaProjects/stoncks/transactions.xls"));
-
-
-        //Start thread to update symbols
-        int daysOutdated = 1;
-
-        System.out.println("Updating Tickers outdated by " + daysOutdated + " days");
-        Thread t1 = new Thread(new TickerUpdater(transactionRepository, tickerRepository, 5, false, daysOutdated));
+        Thread t1 = new Thread(new TickerUpdater(transactionRepository, tickerRepository, 5, true));
         t1.start();
 
 
