@@ -49,24 +49,15 @@ public class StoncksApplication implements CommandLineRunner {
         //Upload transactions to mongodb
 
         //saveToMongo(readExcel("/home/mx/IdeaProjects/stoncks/transactions.xls"));
-        Thread t1 = new Thread(new TickerUpdater(transactionRepository, tickerRepository, 5, true));
+        Thread t1 = new Thread(new TickerUpdater(transactionRepository, tickerRepository, 5, false));
         t1.start();
 
-
-        /*
         PriceReader priceReader;
 
         for(Ticker ticker : tickerRepository.findAll()){
-            priceReader = new PriceReader(ticker);
-
-            for(String s : priceReader.getTimeSeries().keySet()){
-                System.out.println(
-                        ticker.getSymbol() + " " +
-                                s + " " +
-                        priceReader.getPriceByDate(s, "4. close")
-                );
-            }
-        }*/
+            priceReader = new PriceReader(ticker, "Time Series (Daily)");
+            System.out.println(ticker.getSymbol() + "\n" + priceReader.getPricesAsMap());
+        }
 
 /*
         portfolioRepository.deleteAll();

@@ -6,35 +6,44 @@ import com.google.gson.JsonObject;
 import com.stoncks.document.Ticker;
 
 import java.util.HashMap;
+import java.util.Map;
+
 public class PriceReader {
 
     private Ticker ticker;
     private HashMap<String, JsonElement> timeSeries;
 
-    public PriceReader(Ticker ticker) {
+    public PriceReader(Ticker ticker, String timeSeriesText) {
         this.ticker = ticker;
-        this.timeSeries = readTimeSeries();
+        this.timeSeries = readTimeSeries(timeSeriesText);
     }
 
-    public HashMap<String, JsonElement> readTimeSeries () {
+    public HashMap<String, JsonElement> readTimeSeries (String timeSeriesText) {
         HashMap<String, JsonElement> timeSeriesMap = new HashMap<>();
 
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(gson.toJson(this.ticker.getContent()), JsonObject.class);
 
-        JsonObject timeSeriesDaily = jsonObject.getAsJsonObject("Time Series (Daily)");
+        JsonObject timeSeriesDaily = jsonObject.getAsJsonObject(timeSeriesText);
 
         for(String s : timeSeriesDaily.keySet()){
             timeSeriesMap.put(s,timeSeriesDaily.get(s));
         }
         return timeSeriesMap;
-
     }
 
     public double getPriceByDate(String date, String type){
         JsonObject prices = this.timeSeries.get(date).getAsJsonObject();
 
         return Double.parseDouble(prices.get(type).getAsString());
+    }
+
+    public Map<String, Double> getPricesAsMap(){
+        HashMap<String, Double> datePriceMap = new HashMap<>();
+        for(String s : getTimeSeries().keySet()){
+            datePriceMap.put(s, getPriceByDate(s, "4. close"));
+        }
+        return datePriceMap;
     }
 
 

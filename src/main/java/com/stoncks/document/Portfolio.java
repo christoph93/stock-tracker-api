@@ -21,17 +21,6 @@ public class Portfolio {
         this.owner = owner;
     }
 
-    /*
-    public String[] addSymbol(String symbol){
-        List<String> tempSymbols = Arrays.asList(symbols);
-        tempSymbols.add(symbol);
-
-        //convert List to String[]
-        symbols = (String[]) tempSymbols.stream().toArray();
-
-        return symbols;
-    }*/
-
     public String getId() {
         return id;
     }

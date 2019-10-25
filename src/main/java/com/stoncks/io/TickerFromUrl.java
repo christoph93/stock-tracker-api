@@ -3,6 +3,7 @@ package com.stoncks.io;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.stoncks.document.Ticker;
+import org.springframework.data.mongodb.core.aggregation.DateOperators;
 
 import java.io.IOException;
 
@@ -10,6 +11,8 @@ import java.io.InputStreamReader;
 import java.net.*;
 import java.sql.Date;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.temporal.TemporalUnit;
 
 public class TickerFromUrl {
 
@@ -68,7 +71,7 @@ public class TickerFromUrl {
             if(!jsonObject.has("Meta Data")){
                 System.out.println("Response did not contain Meta Data!");
             } else {
-                return new Ticker(object, Date.from(Instant.now()), symbol);
+                return new Ticker(object, Date.from(Instant.now().minusSeconds(10800)), symbol);
             }
             conn.disconnect();
 
