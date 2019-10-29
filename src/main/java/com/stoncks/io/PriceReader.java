@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.stoncks.document.Ticker;
 
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class PriceReader {
         HashMap<String, JsonElement> timeSeriesMap = new HashMap<>();
 
         Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(gson.toJson(this.ticker.getContent()), JsonObject.class);
+        JsonObject jsonObject = gson.fromJson(gson.toJson(this.ticker.getFullContent()), JsonObject.class);
 
         JsonObject timeSeriesDaily = jsonObject.getAsJsonObject(timeSeriesText);
 
@@ -44,6 +45,11 @@ public class PriceReader {
             datePriceMap.put(s, getPriceByDate(s, "4. close"));
         }
         return datePriceMap;
+    }
+
+    public Ticker setClosingPrices(){
+        this.ticker.setClosingPrices(getPricesAsMap());
+        return this.ticker;
     }
 
 

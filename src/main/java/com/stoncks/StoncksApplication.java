@@ -12,17 +12,22 @@ import com.stoncks.repository.TickerRepository;
 import com.stoncks.repository.TransactionRepository;
 import com.stoncks.io.ExcelReader;
 import com.stoncks.service.TickerUpdater;
+import jdk.vm.ci.meta.Local;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.util.BsonUtils;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 @SpringBootApplication
@@ -44,20 +49,64 @@ public class StoncksApplication implements CommandLineRunner {
     public static String API_KEY =  "N6UZN5PBXVO599CV";
 
     @Override
+    @SuppressWarnings("unchecked")
     public void run(String[] args) throws Exception {
 
         //Upload transactions to mongodb
 
         //saveToMongo(readExcel("/home/mx/IdeaProjects/stoncks/transactions.xls"));
-        Thread t1 = new Thread(new TickerUpdater(transactionRepository, tickerRepository, 5, false));
-        t1.start();
+        /*Thread t1 = new Thread(new TickerUpdater(transactionRepository, tickerRepository, 5, false));
+        t1.start();*/
 
-        PriceReader priceReader;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+
+        Date today =  Date.from(Instant.now());
+
+
+
+
+        for(Ticker t : tickerRepository.findAll()){
+            LinkedHashMap<String, Double> closingPricesStringDouble = (LinkedHashMap<String, Double>) t.getClosingPrices();
+            System.out.println("Closing prices object: \n" + closingPricesStringDouble.toString());
+
+            //convert to <LocalDate, Double>
+            LinkedHashMap<Date, Double> closingPricesLocalDate = new LinkedHashMap<>();
+
+            for(String s : closingPricesStringDouble.keySet()){
+                closingPricesLocalDate.put(formatter.parse(s), closingPricesStringDouble.get(s));
+            }
+
+            System.out.println( formatter.format(today) );
+
+            for(Date d : closingPricesLocalDate.keySet()){
+                System.out.println(formatter.format(d));
+            }
+
+
+
+
+
+            /* print ordered */
+            /*
+            closingPricesLocalDate.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.<Date, Double>comparingByKey())
+                    .forEach( System.out::println);
+                    */
+
+        }
+
+
+
+
+
+
+       /* PriceReader priceReader;
 
         for(Ticker ticker : tickerRepository.findAll()){
             priceReader = new PriceReader(ticker, "Time Series (Daily)");
             System.out.println(ticker.getSymbol() + "\n" + priceReader.getPricesAsMap());
-        }
+        }*/
 
 /*
         portfolioRepository.deleteAll();

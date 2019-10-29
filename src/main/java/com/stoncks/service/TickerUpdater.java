@@ -4,6 +4,7 @@ package com.stoncks.service;
 import com.stoncks.StoncksApplication;
 import com.stoncks.document.Ticker;
 import com.stoncks.document.Transaction;
+import com.stoncks.io.PriceReader;
 import com.stoncks.io.TickerFromUrl;
 import com.stoncks.repository.TickerRepository;
 import com.stoncks.repository.TransactionRepository;
@@ -29,7 +30,6 @@ public class TickerUpdater implements Runnable {
         this.reqLimitPerMin = reqLimitPerMin;
         this.onlyMissingSymbols = onlyMissingSymbols;
     }
-
 
     private String[] getMissingSymbolsFromTransactions(){
         String[] allSymbols = getAllSymbolsFromTransactions();
@@ -104,8 +104,10 @@ public class TickerUpdater implements Runnable {
 
             Ticker temp = tfu.getTicker(currentSymbol,"COMPACT");
 
+            PriceReader pr = new PriceReader(temp, "Time Series (Daily)");
+
             System.out.println("Saving Ticker " + temp.getSymbol());
-            tickerRepository.save(temp);
+            tickerRepository.save(pr.setClosingPrices());
             Thread.sleep(1000);
             reqCount++;
             }

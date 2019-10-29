@@ -11,29 +11,35 @@ public class Ticker {
     @Id
     private String id;
 
-    private Object content;
+    private Object fullContent;
+    private Object closingPrices;
     private Date createDate;
     private String symbol;
 
-    public Ticker(Object content, Date createDate, String symbol) {
-        this.content = content;
+    public Ticker(Object fullContent, Date createDate, String symbol) {
+        this.fullContent = fullContent;
         this.createDate = createDate;
         this.symbol = symbol;
     }
 
-    public Ticker(){
-
-    }
     public String getId() {
         return id;
     }
 
-    public Object getContent() {
-        return content;
+    public Object getClosingPrices() {
+        return closingPrices;
     }
 
-    public void setContent(Object content) {
-        this.content = content;
+    public void setClosingPrices(Object closingPrices) {
+        this.closingPrices = closingPrices;
+    }
+
+    public Object getFullContent() {
+        return fullContent;
+    }
+
+    public void setFullContent(Object fullContent) {
+        this.fullContent = fullContent;
     }
 
     public Date getCreateDate() {
@@ -56,7 +62,7 @@ public class Ticker {
     public String toString() {
         return "Ticker{" +
                 "id='" + id + '\'' +
-                ", content='" + content + '\'' +
+                ", content='" + fullContent + '\'' +
                 ", createDate=" + createDate +
                 ", symbol='" + symbol + '\'' +
                 '}';
