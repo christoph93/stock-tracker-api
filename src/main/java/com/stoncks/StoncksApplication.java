@@ -29,6 +29,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 @SpringBootApplication
 public class StoncksApplication implements CommandLineRunner {
@@ -61,27 +63,22 @@ public class StoncksApplication implements CommandLineRunner {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
         Date today =  Date.from(Instant.now());
-
-
-
+        Date todayNoTime = formatter.parse(formatter.format(today));
 
         for(Ticker t : tickerRepository.findAll()){
             LinkedHashMap<String, Double> closingPricesStringDouble = (LinkedHashMap<String, Double>) t.getClosingPrices();
-            System.out.println("Closing prices object: \n" + closingPricesStringDouble.toString());
 
             //convert to <LocalDate, Double>
             LinkedHashMap<Date, Double> closingPricesLocalDate = new LinkedHashMap<>();
-
             for(String s : closingPricesStringDouble.keySet()){
                 closingPricesLocalDate.put(formatter.parse(s), closingPricesStringDouble.get(s));
             }
 
-            System.out.println( formatter.format(today) );
-
-            for(Date d : closingPricesLocalDate.keySet()){
-                System.out.println(formatter.format(d));
-            }
-
+            //get last price
+            ArrayList<Date> datesList = new ArrayList<>(closingPricesLocalDate.keySet());
+            Collections.sort(datesList);
+            System.out.println("Latest date for: " + t.getSymbol() + " " + datesList.get(datesList.size()-1));
+            System.out.println("Latest price: " + closingPricesLocalDate.get(datesList.get(datesList.size()-1)));
 
 
 
