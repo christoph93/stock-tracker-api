@@ -1,11 +1,9 @@
 package com.stoncks.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import com.stoncks.document.Transaction;
+import com.stoncks.document.TransactionDocument;
 
-import java.util.List;
-
-public interface TransactionRepository extends MongoRepository<Transaction, String>{
+public interface TransactionRepository extends MongoRepository<TransactionDocument, String>{
 
 
 

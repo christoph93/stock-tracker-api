@@ -3,19 +3,18 @@ package com.stoncks.io;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.stoncks.document.Ticker;
+import com.stoncks.document.TickerDocument;
 
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
 public class PriceReader {
 
-    private Ticker ticker;
+    private TickerDocument tickerDocument;
     private HashMap<String, JsonElement> timeSeries;
 
-    public PriceReader(Ticker ticker, String timeSeriesText) {
-        this.ticker = ticker;
+    public PriceReader(TickerDocument tickerDocument, String timeSeriesText) {
+        this.tickerDocument = tickerDocument;
         this.timeSeries = readTimeSeries(timeSeriesText);
     }
 
@@ -23,7 +22,7 @@ public class PriceReader {
         HashMap<String, JsonElement> timeSeriesMap = new HashMap<>();
 
         Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(gson.toJson(this.ticker.getFullContent()), JsonObject.class);
+        JsonObject jsonObject = gson.fromJson(gson.toJson(this.tickerDocument.getFullContent()), JsonObject.class);
 
         JsonObject timeSeriesDaily = jsonObject.getAsJsonObject(timeSeriesText);
 
@@ -47,18 +46,18 @@ public class PriceReader {
         return datePriceMap;
     }
 
-    public Ticker setClosingPrices(){
-        this.ticker.setClosingPrices(getPricesAsMap());
-        return this.ticker;
+    public TickerDocument setClosingPrices(){
+        this.tickerDocument.setClosingPrices(getPricesAsMap());
+        return this.tickerDocument;
     }
 
 
-    public Ticker getTicker() {
-        return ticker;
+    public TickerDocument getTickerDocument() {
+        return tickerDocument;
     }
 
-    public void setTicker(Ticker ticker) {
-        this.ticker = ticker;
+    public void setTickerDocument(TickerDocument tickerDocument) {
+        this.tickerDocument = tickerDocument;
     }
 
     public HashMap<String, JsonElement> getTimeSeries() {

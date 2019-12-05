@@ -2,18 +2,18 @@ package com.stoncks.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.stoncks.document.Ticker;
+import com.stoncks.document.TickerDocument;
 
 import java.util.Date;
 import java.util.List;
 
-public interface TickerRepository extends MongoRepository<Ticker, String>{
+public interface TickerRepository extends MongoRepository<TickerDocument, String>{
 
 
-    List<Ticker> findBySymbol(String symbol);
-    List<Ticker> deleteBySymbol(String symbol);
-    List<Ticker> findByCreateDateBefore(Date date);
-    List<Ticker> findByCreateDateAfter(Date date);
+    List<TickerDocument> findBySymbol(String symbol);
+    List<TickerDocument> deleteBySymbol(String symbol);
+    List<TickerDocument> findByCreateDateBefore(Date date);
+    List<TickerDocument> findByCreateDateAfter(Date date);
 
 
 }

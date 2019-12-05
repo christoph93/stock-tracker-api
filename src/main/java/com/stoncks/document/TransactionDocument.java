@@ -8,7 +8,7 @@ import java.util.Date;
 
 
 @Document
-public class Transaction {
+public class TransactionDocument {
 
 
     @Id
@@ -23,7 +23,7 @@ public class Transaction {
     private Date recordCreateDate;
 
 
-    public Transaction(Date transactionDate, String operation, String symbol, String description, double quantity, double price, double totalPrice, Date recordCreateDate) {
+    public TransactionDocument(Date transactionDate, String operation, String symbol, String description, double quantity, double price, double totalPrice, Date recordCreateDate) {
         this.transactionDate = transactionDate;
         this.operation = operation;
         this.symbol = symbol;

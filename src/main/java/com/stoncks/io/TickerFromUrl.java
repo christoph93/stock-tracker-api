@@ -2,8 +2,7 @@ package com.stoncks.io;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.stoncks.document.Ticker;
-import org.springframework.data.mongodb.core.aggregation.DateOperators;
+import com.stoncks.document.TickerDocument;
 
 import java.io.IOException;
 
@@ -11,8 +10,6 @@ import java.io.InputStreamReader;
 import java.net.*;
 import java.sql.Date;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.temporal.TemporalUnit;
 
 public class TickerFromUrl {
 
@@ -25,20 +22,20 @@ public class TickerFromUrl {
     }
 
 
-    public Ticker getTicker(String symbol, String outputSize) {
+    public TickerDocument getTicker(String symbol, String outputSize) {
 
         ////https://www.alphavantage.co/query?function=${json.apiFunction}&symbol=${json.symbol}&interval=${json.interval}&apikey=${conf.apiKey}
         String urlString = "https://www.alphavantage.co/query?function="+ timeSerires + "&symbol=" + symbol + "&outputsize=" + outputSize + "&apikey=" + apiKey;
         System.out.println(urlString);
 
-        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("websurfing1-htl1.esi.adp.com", Integer.parseInt("8080")));
+        /*Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("websurfing1-htl1.esi.adp.com", Integer.parseInt("8080")));
         Authenticator authenticator = new Authenticator() {
 
             public PasswordAuthentication getPasswordAuthentication() {
                 return (new PasswordAuthentication("ccalifi", "27.0tres.9tresA5".toCharArray()));
             }
         };
-        Authenticator.setDefault(authenticator);
+        Authenticator.setDefault(authenticator);*/
 
         //ESI proxy
         /*Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("usproxy.es.oneadp.com", Integer.parseInt("8080")));
@@ -52,7 +49,8 @@ public class TickerFromUrl {
 
         try {
             URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection(proxy);
+            //HttpURLConnection conn = (HttpURLConnection) url.openConnection(proxy);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
 
@@ -71,7 +69,7 @@ public class TickerFromUrl {
             if(!jsonObject.has("Meta Data")){
                 System.out.println("Response did not contain Meta Data!");
             } else {
-                return new Ticker(object, Date.from(Instant.now().minusSeconds(10800)), symbol);
+                return new TickerDocument(object, Date.from(Instant.now().minusSeconds(10800)), symbol);
             }
             conn.disconnect();
 

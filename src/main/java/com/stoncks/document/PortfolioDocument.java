@@ -5,19 +5,19 @@ import org.springframework.data.annotation.Id;
 import java.util.Arrays;
 import java.util.List;
 
-public class Portfolio {
+public class PortfolioDocument {
 
     @Id
     private String id;
 
     private String name;
-    private String[] symbols;
+    private String[] symbols; //list of symbols
     private String owner;
+    private String[] transactions;  //list of transactions Ids
 
 
-    public Portfolio(String name, String[] symbols, String owner) {
+    public PortfolioDocument(String name, String owner) {
         this.name = name;
-        this.symbols = symbols;
         this.owner = owner;
     }
 

@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
 
 @Document
-public class Ticker {
+public class TickerDocument {
 
     @Id
     private String id;
@@ -16,7 +16,7 @@ public class Ticker {
     private Date createDate;
     private String symbol;
 
-    public Ticker(Object fullContent, Date createDate, String symbol) {
+    public TickerDocument(Object fullContent, Date createDate, String symbol) {
         this.fullContent = fullContent;
         this.createDate = createDate;
         this.symbol = symbol;

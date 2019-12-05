@@ -2,20 +2,16 @@ package com.stoncks.service;
 
 
 import com.stoncks.StoncksApplication;
-import com.stoncks.document.Ticker;
-import com.stoncks.document.Transaction;
+import com.stoncks.document.TickerDocument;
+import com.stoncks.document.TransactionDocument;
 import com.stoncks.io.PriceReader;
 import com.stoncks.io.TickerFromUrl;
 import com.stoncks.repository.TickerRepository;
 import com.stoncks.repository.TransactionRepository;
 
-import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-
-import static java.time.temporal.ChronoUnit.DAYS;
 
 public class TickerUpdater implements Runnable {
 
@@ -33,11 +29,11 @@ public class TickerUpdater implements Runnable {
 
     private String[] getMissingSymbolsFromTransactions(){
         String[] allSymbols = getAllSymbolsFromTransactions();
-        List<Ticker> existingTickers = tickerRepository.findAll();
+        List<TickerDocument> existingTickerDocuments = tickerRepository.findAll();
         HashSet<String> existingSymbols = new HashSet<>();
         HashSet<String> missingSymbols = new HashSet<>();
 
-        for(Ticker t : existingTickers){
+        for(TickerDocument t : existingTickerDocuments){
             existingSymbols.add(t.getSymbol());
         }
 
@@ -50,10 +46,10 @@ public class TickerUpdater implements Runnable {
     }
 
     private String[] getAllSymbolsFromTransactions(){
-        List<Transaction> transactions = transactionRepository.findAll();
+        List<TransactionDocument> transactionDocuments = transactionRepository.findAll();
         HashSet<String> symbolsFromTrans = new HashSet<>();
 
-        for (Transaction t : transactions) {
+        for (TransactionDocument t : transactionDocuments) {
             symbolsFromTrans.add(t.getSymbol() + ".SAO");
         }
 
@@ -95,14 +91,14 @@ public class TickerUpdater implements Runnable {
             }
 
             //delete all ticker for that symbol, in case there us more than one
-            List<Ticker> tickersToDelete = tickerRepository.deleteBySymbol(currentSymbol);
+            List<TickerDocument> tickersToDelete = tickerRepository.deleteBySymbol(currentSymbol);
             if(tickersToDelete != null) {
-                for (Ticker t : tickersToDelete) {
+                for (TickerDocument t : tickersToDelete) {
                     System.out.println("Deleting ticker " + t.getSymbol());
                 }
             }
 
-            Ticker temp = tfu.getTicker(currentSymbol,"COMPACT");
+            TickerDocument temp = tfu.getTicker(currentSymbol,"full");
 
             PriceReader pr = new PriceReader(temp, "Time Series (Daily)");
 
