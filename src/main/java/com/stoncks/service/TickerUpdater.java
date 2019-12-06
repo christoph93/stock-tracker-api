@@ -2,11 +2,11 @@ package com.stoncks.service;
 
 
 import com.stoncks.StoncksApplication;
-import com.stoncks.document.TickerDocument;
+import com.stoncks.document.SymbolDocument;
 import com.stoncks.document.TransactionDocument;
 import com.stoncks.io.PriceReader;
 import com.stoncks.io.TickerFromUrl;
-import com.stoncks.repository.TickerRepository;
+import com.stoncks.repository.SymbolRepository;
 import com.stoncks.repository.TransactionRepository;
 
 import java.util.Arrays;
@@ -16,12 +16,12 @@ import java.util.List;
 public class TickerUpdater implements Runnable {
 
     private TransactionRepository transactionRepository;
-    private TickerRepository tickerRepository;
+    private SymbolRepository symbolRepository;
     private int reqLimitPerMin;
     private boolean onlyMissingSymbols;
 
-    public TickerUpdater(TransactionRepository transactionRepository, TickerRepository tickerRepository, int reqLimitPerMin, boolean onlyMissingSymbols){
-        this.tickerRepository = tickerRepository;
+    public TickerUpdater(TransactionRepository transactionRepository, SymbolRepository symbolRepository, int reqLimitPerMin, boolean onlyMissingSymbols){
+        this.symbolRepository = symbolRepository;
         this.transactionRepository = transactionRepository;
         this.reqLimitPerMin = reqLimitPerMin;
         this.onlyMissingSymbols = onlyMissingSymbols;
@@ -29,11 +29,11 @@ public class TickerUpdater implements Runnable {
 
     private String[] getMissingSymbolsFromTransactions(){
         String[] allSymbols = getAllSymbolsFromTransactions();
-        List<TickerDocument> existingTickerDocuments = tickerRepository.findAll();
+        List<SymbolDocument> existingSymbolDocuments = symbolRepository.findAll();
         HashSet<String> existingSymbols = new HashSet<>();
         HashSet<String> missingSymbols = new HashSet<>();
 
-        for(TickerDocument t : existingTickerDocuments){
+        for(SymbolDocument t : existingSymbolDocuments){
             existingSymbols.add(t.getSymbol());
         }
 
@@ -91,19 +91,19 @@ public class TickerUpdater implements Runnable {
             }
 
             //delete all ticker for that symbol, in case there us more than one
-            List<TickerDocument> tickersToDelete = tickerRepository.deleteBySymbol(currentSymbol);
+            List<SymbolDocument> tickersToDelete = symbolRepository.deleteBySymbol(currentSymbol);
             if(tickersToDelete != null) {
-                for (TickerDocument t : tickersToDelete) {
+                for (SymbolDocument t : tickersToDelete) {
                     System.out.println("Deleting ticker " + t.getSymbol());
                 }
             }
 
-            TickerDocument temp = tfu.getTicker(currentSymbol,"full");
+            SymbolDocument temp = tfu.getTicker(currentSymbol,"full");
 
             PriceReader pr = new PriceReader(temp, "Time Series (Daily)");
 
             System.out.println("Saving Ticker " + temp.getSymbol());
-            tickerRepository.save(pr.setClosingPrices());
+            symbolRepository.save(pr.setClosingPrices());
             Thread.sleep(1000);
             reqCount++;
             }

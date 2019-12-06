@@ -1,11 +1,11 @@
 package com.stoncks;
 
 
-import com.stoncks.document.TickerDocument;
+import com.stoncks.document.SymbolDocument;
 import com.stoncks.document.TransactionDocument;
 
 import com.stoncks.repository.PortfolioRepository;
-import com.stoncks.repository.TickerRepository;
+import com.stoncks.repository.SymbolRepository;
 import com.stoncks.repository.TransactionRepository;
 import com.stoncks.io.ExcelReader;
 import com.stoncks.service.TickerUpdater;
@@ -29,7 +29,7 @@ public class StoncksApplication implements CommandLineRunner {
     private TransactionRepository transactionRepository;
 
     @Autowired
-    private TickerRepository tickerRepository;
+    private SymbolRepository symbolRepository;
 
     @Autowired
     private PortfolioRepository portfolioRepository;
@@ -47,7 +47,7 @@ public class StoncksApplication implements CommandLineRunner {
         //Upload transactions to mongodb
 
         //saveToMongo(readExcel("./transactions.xls"));
-        Thread t1 = new Thread(new TickerUpdater(transactionRepository, tickerRepository, 5, false));
+        Thread t1 = new Thread(new TickerUpdater(transactionRepository, symbolRepository, 5, false));
         t1.start();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
@@ -55,7 +55,7 @@ public class StoncksApplication implements CommandLineRunner {
         Date today =  Date.from(Instant.now());
         Date todayNoTime = formatter.parse(formatter.format(today));
 
-        for(TickerDocument t : tickerRepository.findAll()){
+        for(SymbolDocument t : symbolRepository.findAll()){
             LinkedHashMap<String, Double> closingPricesStringDouble = (LinkedHashMap<String, Double>) t.getClosingPrices();
 
             //convert to <LocalDate, Double>

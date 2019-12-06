@@ -3,18 +3,18 @@ package com.stoncks.io;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.stoncks.document.TickerDocument;
+import com.stoncks.document.SymbolDocument;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class PriceReader {
 
-    private TickerDocument tickerDocument;
+    private SymbolDocument symbolDocument;
     private HashMap<String, JsonElement> timeSeries;
 
-    public PriceReader(TickerDocument tickerDocument, String timeSeriesText) {
-        this.tickerDocument = tickerDocument;
+    public PriceReader(SymbolDocument symbolDocument, String timeSeriesText) {
+        this.symbolDocument = symbolDocument;
         this.timeSeries = readTimeSeries(timeSeriesText);
     }
 
@@ -22,7 +22,7 @@ public class PriceReader {
         HashMap<String, JsonElement> timeSeriesMap = new HashMap<>();
 
         Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(gson.toJson(this.tickerDocument.getFullContent()), JsonObject.class);
+        JsonObject jsonObject = gson.fromJson(gson.toJson(this.symbolDocument.getFullContent()), JsonObject.class);
 
         JsonObject timeSeriesDaily = jsonObject.getAsJsonObject(timeSeriesText);
 
@@ -46,18 +46,18 @@ public class PriceReader {
         return datePriceMap;
     }
 
-    public TickerDocument setClosingPrices(){
-        this.tickerDocument.setClosingPrices(getPricesAsMap());
-        return this.tickerDocument;
+    public SymbolDocument setClosingPrices(){
+        this.symbolDocument.setClosingPrices(getPricesAsMap());
+        return this.symbolDocument;
     }
 
 
-    public TickerDocument getTickerDocument() {
-        return tickerDocument;
+    public SymbolDocument getSymbolDocument() {
+        return symbolDocument;
     }
 
-    public void setTickerDocument(TickerDocument tickerDocument) {
-        this.tickerDocument = tickerDocument;
+    public void setSymbolDocument(SymbolDocument symbolDocument) {
+        this.symbolDocument = symbolDocument;
     }
 
     public HashMap<String, JsonElement> getTimeSeries() {

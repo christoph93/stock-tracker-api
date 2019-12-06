@@ -1,16 +1,15 @@
 package com.stoncks.entity;
 
-import com.stoncks.document.TickerDocument;
+import com.stoncks.document.SymbolDocument;
 import com.stoncks.document.TransactionDocument;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class PortfolioEntity {
 
 
     private ArrayList<TransactionDocument> transactionDocuments;
-    private ArrayList<TickerDocument> symbolDocuments;
+    private ArrayList<SymbolDocument> symbolDocuments;
     private String[] symbols;
 
     private String name, owner;
@@ -21,6 +20,14 @@ public class PortfolioEntity {
         this.owner = owner;
     }
 
+    public String[] getSymbols() {
+        return symbols;
+    }
+
+    public void setSymbols(String[] symbols) {
+        this.symbols = symbols;
+    }
+
     public ArrayList<TransactionDocument> getTransactionDocuments() {
         return transactionDocuments;
     }
@@ -29,11 +36,11 @@ public class PortfolioEntity {
         this.transactionDocuments = transactionDocuments;
     }
 
-    public ArrayList<TickerDocument> getSymbolDocuments() {
+    public ArrayList<SymbolDocument> getSymbolDocuments() {
         return symbolDocuments;
     }
 
-    public void setSymbolDocuments(ArrayList<TickerDocument> symbolDocuments) {
+    public void setSymbolDocuments(ArrayList<SymbolDocument> symbolDocuments) {
         this.symbolDocuments = symbolDocuments;
     }
 

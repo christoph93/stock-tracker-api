@@ -5,13 +5,14 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PortfolioRepository extends MongoRepository<PortfolioDocument, String> {
 
 
-    List<PortfolioDocument> findByOwner(String owner);
+    Optional<List<PortfolioDocument>> findByOwner(String owner);
 
-    @Query("{ 'name' : ?0 , 'owner' : ?1}")
-    PortfolioDocument findByNameAndOwner(String name, String owner);
+    @Query("{ 'owner' : ?0 , 'name' : ?1}")
+    Optional<PortfolioDocument> findByNameAndOwner(String owner, String name);
 
 }

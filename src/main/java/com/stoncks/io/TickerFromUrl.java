@@ -2,7 +2,7 @@ package com.stoncks.io;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.stoncks.document.TickerDocument;
+import com.stoncks.document.SymbolDocument;
 
 import java.io.IOException;
 
@@ -22,7 +22,7 @@ public class TickerFromUrl {
     }
 
 
-    public TickerDocument getTicker(String symbol, String outputSize) {
+    public SymbolDocument getTicker(String symbol, String outputSize) {
 
         ////https://www.alphavantage.co/query?function=${json.apiFunction}&symbol=${json.symbol}&interval=${json.interval}&apikey=${conf.apiKey}
         String urlString = "https://www.alphavantage.co/query?function="+ timeSerires + "&symbol=" + symbol + "&outputsize=" + outputSize + "&apikey=" + apiKey;
@@ -69,7 +69,7 @@ public class TickerFromUrl {
             if(!jsonObject.has("Meta Data")){
                 System.out.println("Response did not contain Meta Data!");
             } else {
-                return new TickerDocument(object, Date.from(Instant.now().minusSeconds(10800)), symbol);
+                return new SymbolDocument(object, Date.from(Instant.now().minusSeconds(10800)), symbol);
             }
             conn.disconnect();
 
