@@ -38,19 +38,19 @@ public class TickerFromUrl {
         Authenticator.setDefault(authenticator);*/
 
         //ESI proxy
-        /*Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("usproxy.es.oneadp.com", Integer.parseInt("8080")));
+        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("usproxy.es.oneadp.com", Integer.parseInt("8080")));
         Authenticator authenticator = new Authenticator() {
 
             public PasswordAuthentication getPasswordAuthentication() {
-                return (new PasswordAuthentication("ESIccalifi", "27.0tres.9tresA7".toCharArray()));
+                return (new PasswordAuthentication("ESIccalifi", "27.0tres.9tresA8".toCharArray()));
             }
         };
-        Authenticator.setDefault(authenticator);*/
+        Authenticator.setDefault(authenticator);
 
         try {
             URL url = new URL(urlString);
-            //HttpURLConnection conn = (HttpURLConnection) url.openConnection(proxy);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection(proxy);
+            //HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
 

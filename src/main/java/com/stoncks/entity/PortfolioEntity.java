@@ -8,9 +8,9 @@ import java.util.ArrayList;
 public class PortfolioEntity {
 
 
-    private ArrayList<TransactionDocument> transactionDocuments;
     private ArrayList<SymbolDocument> symbolDocuments;
     private String[] symbols;
+    private ArrayList<PositionEntity> positions;
 
     private String name, owner, id;
 
@@ -19,6 +19,14 @@ public class PortfolioEntity {
         this.name = name;
         this.owner = owner;
         this.id = id;
+    }
+
+    public ArrayList<PositionEntity> getPositions() {
+        return positions;
+    }
+
+    public void setPositions(ArrayList<PositionEntity> positions) {
+        this.positions = positions;
     }
 
     public String[] getSymbols() {
@@ -35,14 +43,6 @@ public class PortfolioEntity {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public ArrayList<TransactionDocument> getTransactionDocuments() {
-        return transactionDocuments;
-    }
-
-    public void setTransactionDocuments(ArrayList<TransactionDocument> transactionDocuments) {
-        this.transactionDocuments = transactionDocuments;
     }
 
     public ArrayList<SymbolDocument> getSymbolDocuments() {

@@ -1,9 +1,11 @@
+
 package com.stoncks.manager;
 
 import com.stoncks.document.PortfolioDocument;
 import com.stoncks.document.SymbolDocument;
 import com.stoncks.document.TransactionDocument;
 import com.stoncks.entity.PortfolioEntity;
+import com.stoncks.entity.PositionEntity;
 import com.stoncks.repository.PortfolioRepository;
 import com.stoncks.repository.SymbolRepository;
 import com.stoncks.repository.TransactionRepository;
@@ -19,6 +21,44 @@ public class PortfolioManager {
 
     public PortfolioManager(PortfolioRepository portfolioRepository) {
         this.portfolioRepository = portfolioRepository;
+    }
+
+
+    public void calculatePositions(PortfolioEntity portfolioEntity){
+
+        //reset positions
+        portfolioEntity.setPositions(new ArrayList<>());
+        for(SymbolDocument sd : portfolioEntity.getSymbolDocuments()){
+            portfolioEntity.getPositions().add(new PositionEntity(sd.getSymbol(), portfolioEntity.getId()));
+        }
+        //load transactions for each position
+        for(PositionEntity pe : portfolioEntity.getPositions()) {
+            transactionRepository.findBySymbol(pe.getSymbol()).ifPresent(pe::setTransactionDocuments);
+
+
+
+            //calculate avgs and profits from transactions
+            for(TransactionDocument td : pe.getTransactionDocuments()){
+                if(td.getOperation().equals("C")){
+                    pe.unitsBought+= td.getQuantity();
+                    pe.totalPositionBought+=td.getTotalPrice();
+                } else if (td.getOperation().equals("V")){
+                    pe.unitsSold+=td.getQuantity();
+                    pe.totalPositionSold+=td.getTotalPrice();
+                }
+            }
+
+            pe.avgBuyPrice = pe.totalPositionBought/pe.unitsBought;
+
+            if(pe.unitsSold != 0){
+                pe.avgSellPrice = pe.totalPositionSold/pe.unitsSold;
+            } else {
+                pe.avgSellPrice = 0;
+            }
+
+        }
+
+
     }
 
 
@@ -40,15 +80,12 @@ public class PortfolioManager {
         );
 
         ArrayList<SymbolDocument> symbolDocuments = new ArrayList<>(portfolioEntity.getSymbols().length);
-        ArrayList<TransactionDocument> transactionDocuments = new ArrayList<>();
 
         for(String s : portfolioEntity.getSymbols()){
             symbolRepository.findBySymbol(s).ifPresent(symbolDocuments::add);
-            transactionRepository.findBySymbol(s).ifPresent(transactionDocuments::addAll);
         }
 
         portfolioEntity.setSymbolDocuments(symbolDocuments);
-        portfolioEntity.setTransactionDocuments(transactionDocuments);
 
         return portfolioEntity;
     }

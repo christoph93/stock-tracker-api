@@ -15,6 +15,8 @@ public class SymbolDocument {
     private Object closingPrices;
     private Date createDate;
     private String symbol;
+    private double lastPrice;
+    private Date lastPriceDate;
 
     public SymbolDocument(Object fullContent, Date createDate, String symbol) {
         this.fullContent = fullContent;

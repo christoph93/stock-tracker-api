@@ -90,7 +90,7 @@ public class TickerUpdater implements Runnable {
                 firstReq = System.currentTimeMillis();
             }
 
-            //delete all ticker for that symbol, in case there us more than one
+            //delete all ticker for that symbol, in case there is more than one
             List<SymbolDocument> tickersToDelete = symbolRepository.deleteBySymbol(currentSymbol);
             if(tickersToDelete != null) {
                 for (SymbolDocument t : tickersToDelete) {

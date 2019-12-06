@@ -13,7 +13,6 @@ public class PortfolioDocument {
     private String name;
     private String[] symbols; //list of symbols
     private String owner;
-    private String[] transactions;  //list of transactions Ids
 
 
     public PortfolioDocument(String name, String owner) {
