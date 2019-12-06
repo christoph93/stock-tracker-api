@@ -33,6 +33,7 @@ public class PortfolioManager {
         portfolioRepository.findById(id).ifPresent(pd::set);
 
         PortfolioEntity portfolioEntity = new PortfolioEntity(
+                pd.get().getId(),
                 pd.get().getSymbols(),
                 pd.get().getOwner(),
                 pd.get().getName()
@@ -53,77 +54,83 @@ public class PortfolioManager {
     }
 
 
-    public String updateName(String name, String owner, String newName){
-        PortfolioDocument portfolioDocument = portfolioRepository.findByNameAndOwner(name, owner).get();
-        portfolioDocument.setName(newName);
-        return (portfolioRepository.save(portfolioDocument) != null ? portfolioDocument.getName() : null);
-    }
+    public String[] addSymbol(PortfolioEntity portfolioEntity, String symbol){
+        //get the document
+        PortfolioDocument portfolioDocument = portfolioRepository.findById(portfolioEntity.getId()).get();
+        HashSet<String> tempSymbols = new HashSet<>(Arrays.asList(portfolioEntity.getSymbols()));
 
-    public String updateOwner(String name, String owner, String newOwner){
-        PortfolioDocument portfolioDocument = portfolioRepository.findByNameAndOwner(name, owner).get();
-        portfolioDocument.setName(newOwner);
-        return (portfolioRepository.save(portfolioDocument) != null ? portfolioDocument.getOwner() : null);
-    }
+        tempSymbols.add(symbol);
 
-    public String[] addSymbol(String name, String owner, String symbol){
-        PortfolioDocument portfolioDocument = portfolioRepository.findByNameAndOwner(name, owner).get();
-        HashSet<String> tempSymbols = new HashSet<>(Arrays.asList(portfolioDocument.getSymbols()));
-        if(!tempSymbols.add(symbol)) return null;
-        Object [] aux = tempSymbols.toArray();
-        String[] symbols = new String[tempSymbols.size()];
-        //convert List to String[]
-        for(int i = 0; i < tempSymbols.size(); i++){
-            symbols[i] = aux[i].toString();
-        }
-        portfolioDocument.setSymbols(symbols);
-        return (portfolioRepository.save(portfolioDocument) != null ? portfolioDocument.getSymbols() : null);
+        String[] symbolsArray = (String[]) tempSymbols.toArray();
+
+        portfolioDocument.setSymbols(symbolsArray);
+        portfolioEntity.setSymbols(symbolsArray);
+
+        portfolioRepository.save(portfolioDocument);
+
+        return symbolsArray;
     }
 
 
-    public  String[] addSymbols(String name, String owner, List<String> symbolsList){
-        PortfolioDocument portfolioDocument = portfolioRepository.findByNameAndOwner(name, owner).get();
-        HashSet<String> tempSymbols = new HashSet<>(Arrays.asList(portfolioDocument.getSymbols()));
-        tempSymbols.addAll(Arrays.asList(portfolioDocument.getSymbols()));
+    public  String[] addSymbols(PortfolioEntity portfolioEntity, List<String> symbolsList){
+        PortfolioDocument portfolioDocument = portfolioRepository.findById(portfolioEntity.getId()).get();
+        HashSet<String> tempSymbols = new HashSet<>(Arrays.asList(portfolioEntity.getSymbols()));
+
         tempSymbols.addAll(symbolsList);
-        //convert List to String[]
-        Object [] aux = tempSymbols.toArray();
-        String[] symbols = new String[tempSymbols.size()];
-        //convert List to String[]
-        for(int i = 0; i < tempSymbols.size(); i++){
-            symbols[i] = aux[i].toString();
-        }
-        portfolioDocument.setSymbols(symbols);
-        return (portfolioRepository.save(portfolioDocument) != null ? portfolioDocument.getSymbols() : null);
+
+        String[] symbolsArray = (String[]) tempSymbols.toArray();
+
+        portfolioDocument.setSymbols(symbolsArray);
+        portfolioEntity.setSymbols(symbolsArray);
+
+        portfolioRepository.save(portfolioDocument);
+
+        return symbolsArray;
     }
 
-    public String[] removeSymbol(String name, String owner, String symbol){
-        PortfolioDocument portfolioDocument = portfolioRepository.findByNameAndOwner(name, owner).get();
-        HashSet<String> tempSymbols = new HashSet<>(Arrays.asList(portfolioDocument.getSymbols()));
+    public String[] removeSymbol(PortfolioEntity portfolioEntity,  String symbol){
+        //get the document
+        PortfolioDocument portfolioDocument = portfolioRepository.findById(portfolioEntity.getId()).get();
+        HashSet<String> tempSymbols = new HashSet<>(Arrays.asList(portfolioEntity.getSymbols()));
+
         tempSymbols.remove(symbol);
-        Object [] aux = tempSymbols.toArray();
-        String[] symbols = new String[tempSymbols.size()];
-        //convert List to String[]
-        for(int i = 0; i < tempSymbols.size(); i++){
-            symbols[i] = aux[i].toString();
-        }
-        portfolioDocument.setSymbols(symbols);
-        return (portfolioRepository.save(portfolioDocument) != null ? portfolioDocument.getSymbols() : null);
+
+        String[] symbolsArray = (String[]) tempSymbols.toArray();
+
+        portfolioDocument.setSymbols(symbolsArray);
+        portfolioEntity.setSymbols(symbolsArray);
+
+        portfolioRepository.save(portfolioDocument);
+
+        return symbolsArray;
     }
 
-    public String[] removeSymbols(String name, String owner, List<String> symbols){
-        PortfolioDocument portfolioDocument = portfolioRepository.findByNameAndOwner(name, owner).get();
-        HashSet<String> tempSymbols = new HashSet<>();
-        tempSymbols.addAll(Arrays.asList(portfolioDocument.getSymbols()));
-        tempSymbols.removeAll(symbols);
-        portfolioDocument.setSymbols((String[]) tempSymbols.toArray());
-        return (portfolioRepository.save(portfolioDocument) != null ? portfolioDocument.getSymbols() : null);
+    public String[] removeSymbols(PortfolioEntity portfolioEntity,  List<String> symbolsList){
+        //get the document
+        PortfolioDocument portfolioDocument = portfolioRepository.findById(portfolioEntity.getId()).get();
+        HashSet<String> tempSymbols = new HashSet<>(Arrays.asList(portfolioEntity.getSymbols()));
+
+        tempSymbols.removeAll(symbolsList);
+
+        String[] symbolsArray = (String[]) tempSymbols.toArray();
+
+        portfolioDocument.setSymbols(symbolsArray);
+        portfolioEntity.setSymbols(symbolsArray);
+
+        portfolioRepository.save(portfolioDocument);
+
+        return symbolsArray;
     }
 
-    public boolean removeAllSymbols(String name, String owner){
-        PortfolioDocument portfolioDocument = portfolioRepository.findByNameAndOwner(name, owner).get();
-        portfolioDocument.setSymbols(new String[] {});
-        return (portfolioRepository.save(portfolioDocument) != null);
+    public boolean removeAllSymbols(PortfolioEntity portfolioEntity){
+        PortfolioDocument portfolioDocument = portfolioRepository.findById(portfolioEntity.getId()).get();
+        String[] symbolsArray = new String[1];
 
+        portfolioDocument.setSymbols(symbolsArray);
+        portfolioEntity.setSymbols(symbolsArray);
+
+        portfolioRepository.save(portfolioDocument);
+        return true;
     }
 
 }

@@ -12,12 +12,13 @@ public class PortfolioEntity {
     private ArrayList<SymbolDocument> symbolDocuments;
     private String[] symbols;
 
-    private String name, owner;
+    private String name, owner, id;
 
-    public PortfolioEntity(String[] symbols, String name, String owner) {
+    public PortfolioEntity(String id, String[] symbols, String name, String owner) {
         this.symbols = symbols;
         this.name = name;
         this.owner = owner;
+        this.id = id;
     }
 
     public String[] getSymbols() {
@@ -26,6 +27,14 @@ public class PortfolioEntity {
 
     public void setSymbols(String[] symbols) {
         this.symbols = symbols;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public ArrayList<TransactionDocument> getTransactionDocuments() {
