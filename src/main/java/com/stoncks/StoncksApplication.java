@@ -1,11 +1,10 @@
 package com.stoncks;
 
 
-import com.stoncks.document.PortfolioDocument;
-import com.stoncks.document.TransactionDocument;
+import com.stoncks.document.Portfolio;
+import com.stoncks.document.Transaction;
 
-import com.stoncks.entity.PortfolioEntity;
-import com.stoncks.entity.PositionEntity;
+import com.stoncks.entity.Position;
 import com.stoncks.manager.PortfolioManager;
 import com.stoncks.repository.PortfolioRepository;
 import com.stoncks.repository.SymbolRepository;
@@ -23,7 +22,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 @SpringBootApplication
@@ -70,8 +68,8 @@ public class StoncksApplication implements CommandLineRunner {
        //Symbol list from transactions
         HashSet<String> uniqueSymbols = new HashSet<>();
 
-        for(TransactionDocument td : transactionRepository.findAll()){
-            uniqueSymbols.add(td.getSymbol());
+        for(Transaction td : transactionRepository.findAll()){
+            uniqueSymbols.add(td.getSymbol()+".SAO");
         }
 
         System.out.println("unique symbols from transactions");
@@ -87,29 +85,22 @@ public class StoncksApplication implements CommandLineRunner {
             System.out.println(s);
         }
 
+
+
         String name = "Portfolio 1";
         String owner = "Owner 1";
 
-        PortfolioManager portfolioManager = new PortfolioManager(portfolioRepository);
+        PortfolioManager portfolioManager = new PortfolioManager(portfolioRepository,symbolRepository,transactionRepository);
 
-        Optional<PortfolioDocument> opt;
-        opt = portfolioRepository.findByNameAndOwner(owner, name);
+        Portfolio testPortfolio = portfolioManager.createPortfolio(owner, name);
 
-        PortfolioEntity portfolioEntity;
+        testPortfolio.addSymbols(Arrays.asList(symbols));
+        portfolioManager.generatePositions(testPortfolio);
 
-        if(opt.isPresent()){
-            portfolioEntity = portfolioManager.portfolioEntityFromDocument(opt.get());
-        } else {
-            portfolioEntity = new PortfolioEntity(symbols, name, owner);
-        }
+        for(Position position : testPortfolio.getPositions()){
+                System.out.println(position);
+            }
 
-        portfolioRepository.save(portfolioEntity.asDocument());
-
-        portfolioManager.calculatePositions(portfolioEntity);
-
-        for(PositionEntity pe : portfolioEntity.getPositions()){
-            System.out.println(pe.toString());
-        }
 
 
     }
@@ -117,10 +108,10 @@ public class StoncksApplication implements CommandLineRunner {
 
 
 
-    public ArrayList<TransactionDocument> readExcel(String path) throws ParseException {
+    public ArrayList<Transaction> readExcel(String path) throws ParseException {
         ArrayList<String[]> table;
         String line = "";
-        ArrayList<TransactionDocument> transactionDocuments = new ArrayList<>();
+        ArrayList<Transaction> transactions = new ArrayList<>();
 
         ExcelReader er = new ExcelReader();
 
@@ -141,7 +132,7 @@ public class StoncksApplication implements CommandLineRunner {
         //table.get(i)[0].trim()
 
         for(int i = 1; i < table.size(); i++){
-            transactionDocuments.add(new TransactionDocument(
+            transactions.add(new Transaction(
                     formatter.parse(table.get(i)[0].trim()),
                     table.get(i)[2].trim(),
                     table.get(i)[5].trim(),
@@ -153,20 +144,20 @@ public class StoncksApplication implements CommandLineRunner {
             ));
         }
 
-    return transactionDocuments;
+    return transactions;
 
     }
 
 
-    public void saveToMongo(ArrayList<TransactionDocument> transactionDocuments){
+    public void saveToMongo(ArrayList<Transaction> transactions){
 
 
         transactionRepository.deleteAll();
-        transactionRepository.saveAll(transactionDocuments);
+        transactionRepository.saveAll(transactions);
 
         System.out.println("Saved the following transactions");
 
-        for (TransactionDocument t : transactionRepository.findAll()) {
+        for (Transaction t : transactionRepository.findAll()) {
             System.out.println(t);
         }
     }

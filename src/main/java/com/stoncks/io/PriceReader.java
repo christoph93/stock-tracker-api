@@ -3,7 +3,7 @@ package com.stoncks.io;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.stoncks.document.SymbolDocument;
+import com.stoncks.document.Symbol;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,13 +11,13 @@ import java.util.*;
 
 public class PriceReader {
 
-    private SymbolDocument symbolDocument;
+    private Symbol symbol;
     private HashMap<String, JsonElement> timeSeries;
     private double lastPrice;
     private Date lastPriceDate;
 
-    public PriceReader(SymbolDocument symbolDocument, String timeSeriesText) {
-        this.symbolDocument = symbolDocument;
+    public PriceReader(Symbol symbol, String timeSeriesText) {
+        this.symbol = symbol;
         this.timeSeries = readTimeSeries(timeSeriesText);
     }
 
@@ -25,7 +25,7 @@ public class PriceReader {
         HashMap<String, JsonElement> timeSeriesMap = new HashMap<>();
 
         Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(gson.toJson(this.symbolDocument.getFullContent()), JsonObject.class);
+        JsonObject jsonObject = gson.fromJson(gson.toJson(this.symbol.getFullContent()), JsonObject.class);
 
         JsonObject timeSeriesDaily = jsonObject.getAsJsonObject(timeSeriesText);
 
@@ -67,20 +67,20 @@ public class PriceReader {
         return datePriceMap;
     }
 
-    public SymbolDocument setClosingPrices() throws ParseException {
-        this.symbolDocument.setClosingPrices(getPricesAsMap());
-        this.symbolDocument.setLastPrice(lastPrice);
-        this.symbolDocument.setLastPriceDate(lastPriceDate);
-        return this.symbolDocument;
+    public Symbol setClosingPrices() throws ParseException {
+        this.symbol.setClosingPrices(getPricesAsMap());
+        this.symbol.setLastPrice(lastPrice);
+        this.symbol.setLastPriceDate(lastPriceDate);
+        return this.symbol;
     }
 
 
-    public SymbolDocument getSymbolDocument() {
-        return symbolDocument;
+    public Symbol getSymbol() {
+        return symbol;
     }
 
-    public void setSymbolDocument(SymbolDocument symbolDocument) {
-        this.symbolDocument = symbolDocument;
+    public void setSymbol(Symbol symbol) {
+        this.symbol = symbol;
     }
 
     public HashMap<String, JsonElement> getTimeSeries() {

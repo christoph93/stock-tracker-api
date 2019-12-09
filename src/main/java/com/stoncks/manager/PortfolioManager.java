@@ -1,17 +1,19 @@
 
 package com.stoncks.manager;
 
-import com.stoncks.document.PortfolioDocument;
-import com.stoncks.document.SymbolDocument;
-import com.stoncks.document.TransactionDocument;
-import com.stoncks.entity.PortfolioEntity;
-import com.stoncks.entity.PositionEntity;
+import com.stoncks.document.Portfolio;
+import com.stoncks.document.Symbol;
+import com.stoncks.document.Transaction;
+import com.stoncks.entity.Position;
 import com.stoncks.repository.PortfolioRepository;
 import com.stoncks.repository.SymbolRepository;
 import com.stoncks.repository.TransactionRepository;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import javax.sound.sampled.Port;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 
 public class PortfolioManager {
 
@@ -19,161 +21,130 @@ public class PortfolioManager {
     private SymbolRepository symbolRepository;
     private TransactionRepository transactionRepository;
 
-    public PortfolioManager(PortfolioRepository portfolioRepository) {
+    public PortfolioManager(PortfolioRepository portfolioRepository, SymbolRepository symbolRepository, TransactionRepository transactionRepository) {
         this.portfolioRepository = portfolioRepository;
+        this.symbolRepository = symbolRepository;
+        this.transactionRepository = transactionRepository;
     }
 
 
-    public void pullSymbols(PortfolioEntity portfolioEntity){
-        HashSet<String> symbols = new HashSet<>(Arrays.asList(portfolioEntity.getSymbols()));
+    public Portfolio createPortfolio(String owner, String name){
+        //check if portfolio already exists or create a new one
+        Portfolio portfolio;
+        Optional<Portfolio> optionalPortfolio = portfolioRepository.findByOwnerAndName(owner, name);
 
-        for (String s : symbols){
-            addSymbol(portfolioEntity, s);
+        if(optionalPortfolio.isPresent()){
+            return optionalPortfolio.get();
+        } else {
+            portfolio = new Portfolio(owner, name);
         }
 
+        portfolioRepository.save(portfolio);
+        return portfolioRepository.findByOwnerAndName(owner, name).get();
     }
 
 
-    public void calculatePositions(PortfolioEntity portfolioEntity){
-        pullSymbols(portfolioEntity);
+    public boolean addSymbol(Portfolio portfolio, String symbol){
+        Optional<Portfolio> optionalPortfolio = portfolioRepository.findById(portfolio.getId());
 
-        //reset positions
-        portfolioEntity.setPositions(new ArrayList<>());
-        for(SymbolDocument sd : portfolioEntity.getSymbolDocuments()){
-            portfolioEntity.getPositions().add(new PositionEntity(sd.getSymbol(), portfolioEntity.getId()));
+        if(optionalPortfolio.isPresent()){
+            optionalPortfolio.get().addSymbol(symbol);
+            portfolioRepository.save(optionalPortfolio.get());
+            return true;
         }
+        return false;
+    }
+
+
+    public boolean addSymbols(Portfolio portfolio, List<String> symbols){
+        Optional<Portfolio> optionalPortfolio = portfolioRepository.findById(portfolio.getId());
+
+        if(optionalPortfolio.isPresent()){
+            optionalPortfolio.get().addSymbols(symbols);
+            portfolioRepository.save(optionalPortfolio.get());
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeSymbol(Portfolio portfolio, String symbol){
+        Optional<Portfolio> optionalPortfolio = portfolioRepository.findById(portfolio.getId());
+
+        if(optionalPortfolio.isPresent()){
+            optionalPortfolio.get().removeSymbol(symbol);
+            portfolioRepository.save(optionalPortfolio.get());
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeSymbols(Portfolio portfolio, List<String> symbols){
+        Optional<Portfolio> optionalPortfolio = portfolioRepository.findById(portfolio.getId());
+
+        if(optionalPortfolio.isPresent()){
+            optionalPortfolio.get().removeSymbols(symbols);
+            portfolioRepository.save(optionalPortfolio.get());
+            return true;
+        }
+        return false;
+    }
+
+
+    public void generatePositions (Portfolio portfolio){
+        ArrayList<Symbol> symbols = new ArrayList<>();
+        for(String s : portfolio.getSymbols()) {
+            System.out.println("finding symbol" + s);
+            symbolRepository.findBySymbol(s).ifPresent(symbols::add);
+        }
+
+        ArrayList<Position> positions = new ArrayList<>();
+
+        for(Symbol symbol : symbols){
+            //create a new position for each symbol
+            positions.add(new Position(symbol.getSymbol(), portfolio.getId()));
+        }
+
+        portfolio.setPositions(positions);
+
+
         //load transactions for each position
-        for(PositionEntity pe : portfolioEntity.getPositions()) {
-            transactionRepository.findBySymbol(pe.getSymbol()).ifPresent(pe::setTransactionDocuments);
+        for(Position position : portfolio.getPositions()) {
+            transactionRepository.findBySymbol(position.getSymbol().replace(".SAO", "") ).ifPresent(position::setTransactions);
 
             //calculate avgs and profits from transactions
-            for(TransactionDocument td : pe.getTransactionDocuments()){
-                if(td.getOperation().equals("C")){
-                    pe.unitsBought+= td.getQuantity();
-                    pe.totalPositionBought+=td.getTotalPrice();
-                } else if (td.getOperation().equals("V")){
-                    pe.unitsSold+=td.getQuantity();
-                    pe.totalPositionSold+=td.getTotalPrice();
+            for(Transaction transaction : position.getTransactions()){
+                if(transaction.getOperation().equals("C")){
+                    position.unitsBought+= transaction.getQuantity();
+                    position.totalPositionBought+=transaction.getTotalPrice();
+                } else if (transaction.getOperation().equals("V")){
+                    position.unitsSold+=transaction.getQuantity();
+                    position.totalPositionSold+=transaction.getTotalPrice();
                 }
             }
 
-            pe.avgBuyPrice = pe.totalPositionBought/pe.unitsBought;
+            position.avgBuyPrice = position.totalPositionBought/position.unitsBought;
 
-            if(pe.unitsSold != 0){
-                pe.avgSellPrice = pe.totalPositionSold/pe.unitsSold;
+            if(position.unitsSold != 0){
+                position.avgSellPrice = position.totalPositionSold/position.unitsSold;
             } else {
-                pe.avgSellPrice = 0;
+                position.avgSellPrice = 0;
             }
+
+            position.openPosition = position.unitsBought - position.unitsSold;
+
+            Symbol tempSymbol = symbolRepository.findBySymbol(position.getSymbol()).get();
+
+            position.openPositionValue = (position.openPosition*tempSymbol.getLastPrice()) -(position.openPosition*position.avgBuyPrice);
+
+
+
         }
 
 
     }
 
-/*
-    public Optional<PortfolioEntity> portfolioEntityFromDocument(String owner, String name){
-        AtomicReference<PortfolioEntity> pe = null;
-        portfolioRepository.findByNameAndOwner(owner, name).ifPresent(portfolioDocument -> pe.set(portfolioEntityFromDocument(portfolioDocument.getId())));
-        return null;
-        }
-
- */
-
-    public PortfolioEntity portfolioEntityFromDocument(PortfolioDocument pd){
-
-        PortfolioEntity portfolioEntity = new PortfolioEntity(
-                pd.getId(),
-                pd.getSymbols(),
-                pd.getOwner(),
-                pd.getName()
-        );
-
-        ArrayList<SymbolDocument> symbolDocuments = new ArrayList<>(portfolioEntity.getSymbols().length);
-
-        for(String s : portfolioEntity.getSymbols()){
-            symbolRepository.findBySymbol(s).ifPresent(symbolDocuments::add);
-        }
-
-        portfolioEntity.setSymbolDocuments(symbolDocuments);
-
-        return portfolioEntity;
-    }
 
 
-    public void addSymbol(PortfolioEntity portfolioEntity, String symbol){
-        //get the document
-        PortfolioDocument portfolioDocument = portfolioRepository.findById(portfolioEntity.getId()).get();
-        HashSet<String> tempSymbols = new HashSet<>(Arrays.asList(portfolioEntity.getSymbols()));
 
-        tempSymbols.add(symbol);
-
-        String[] symbolsArray = (String[]) tempSymbols.toArray();
-
-        portfolioDocument.setSymbols(symbolsArray);
-        portfolioEntity.setSymbols(symbolsArray);
-
-        portfolioRepository.save(portfolioDocument);
-    }
-
-
-    public  String[] addSymbols(PortfolioEntity portfolioEntity, List<String> symbolsList){
-        PortfolioDocument portfolioDocument = portfolioRepository.findById(portfolioEntity.getId()).get();
-        HashSet<String> tempSymbols = new HashSet<>(Arrays.asList(portfolioEntity.getSymbols()));
-
-        tempSymbols.addAll(symbolsList);
-
-        String[] symbolsArray = (String[]) tempSymbols.toArray();
-
-        portfolioDocument.setSymbols(symbolsArray);
-        portfolioEntity.setSymbols(symbolsArray);
-
-        portfolioRepository.save(portfolioDocument);
-
-        return symbolsArray;
-    }
-
-    public String[] removeSymbol(PortfolioEntity portfolioEntity,  String symbol){
-        //get the document
-        PortfolioDocument portfolioDocument = portfolioRepository.findById(portfolioEntity.getId()).get();
-        HashSet<String> tempSymbols = new HashSet<>(Arrays.asList(portfolioEntity.getSymbols()));
-
-        tempSymbols.remove(symbol);
-
-        String[] symbolsArray = (String[]) tempSymbols.toArray();
-
-        portfolioDocument.setSymbols(symbolsArray);
-        portfolioEntity.setSymbols(symbolsArray);
-
-        portfolioRepository.save(portfolioDocument);
-
-        return symbolsArray;
-    }
-
-    public String[] removeSymbols(PortfolioEntity portfolioEntity,  List<String> symbolsList){
-        //get the document
-        PortfolioDocument portfolioDocument = portfolioRepository.findById(portfolioEntity.getId()).get();
-        HashSet<String> tempSymbols = new HashSet<>(Arrays.asList(portfolioEntity.getSymbols()));
-
-        tempSymbols.removeAll(symbolsList);
-
-        String[] symbolsArray = (String[]) tempSymbols.toArray();
-
-        portfolioDocument.setSymbols(symbolsArray);
-        portfolioEntity.setSymbols(symbolsArray);
-
-        portfolioRepository.save(portfolioDocument);
-
-        return symbolsArray;
-    }
-
-    public boolean removeAllSymbols(PortfolioEntity portfolioEntity){
-        PortfolioDocument portfolioDocument = portfolioRepository.findById(portfolioEntity.getId()).get();
-        String[] symbolsArray = new String[1];
-
-        portfolioDocument.setSymbols(symbolsArray);
-        portfolioEntity.setSymbols(symbolsArray);
-
-        portfolioRepository.save(portfolioDocument);
-        return true;
-    }
 
 }

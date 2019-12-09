@@ -1,15 +1,15 @@
 package com.stoncks.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
-import com.stoncks.document.TransactionDocument;
+import com.stoncks.document.Transaction;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface TransactionRepository extends MongoRepository<TransactionDocument, String>{
+public interface TransactionRepository extends MongoRepository<Transaction, String>{
 
 
-    Optional<List<TransactionDocument>> findBySymbol(String symbol);
+    Optional<List<Transaction>> findBySymbol(String symbol);
 
 
     }

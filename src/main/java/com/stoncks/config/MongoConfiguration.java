@@ -28,13 +28,16 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
     @Value("${spring.data.mongodb.database:test}")
     private String database;
 
+    /*
     @Value("${spring.data.mongodb.uri:mongodb+srv://admin:admin@christoph-fqybv.mongodb.net/test?retryWrites=true&w=majority}")
     private MongoClientURI uri;
 
-/*
+
+     */
+
     @Value("${spring.data.mongodb.host:localhost}:${spring.data.mongodb.port:27017}")
     private String host;
- */
+
 
 
 
@@ -49,7 +52,7 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
 
     @Override
     public MongoClient mongoClient() {
-        return new MongoClient(uri);
+        return new MongoClient(host);
     }
 
     @Override
