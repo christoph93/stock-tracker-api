@@ -24,7 +24,18 @@ public class PortfolioManager {
     }
 
 
+    public void pullSymbols(PortfolioEntity portfolioEntity){
+        HashSet<String> symbols = new HashSet<>(Arrays.asList(portfolioEntity.getSymbols()));
+
+        for (String s : symbols){
+            addSymbol(portfolioEntity, s);
+        }
+
+    }
+
+
     public void calculatePositions(PortfolioEntity portfolioEntity){
+        pullSymbols(portfolioEntity);
 
         //reset positions
         portfolioEntity.setPositions(new ArrayList<>());
@@ -34,8 +45,6 @@ public class PortfolioManager {
         //load transactions for each position
         for(PositionEntity pe : portfolioEntity.getPositions()) {
             transactionRepository.findBySymbol(pe.getSymbol()).ifPresent(pe::setTransactionDocuments);
-
-
 
             //calculate avgs and profits from transactions
             for(TransactionDocument td : pe.getTransactionDocuments()){
@@ -55,28 +64,27 @@ public class PortfolioManager {
             } else {
                 pe.avgSellPrice = 0;
             }
-
         }
 
 
     }
 
-
-    public PortfolioEntity portfolioEntityFromDocument(String owner, String name){
+/*
+    public Optional<PortfolioEntity> portfolioEntityFromDocument(String owner, String name){
         AtomicReference<PortfolioEntity> pe = null;
         portfolioRepository.findByNameAndOwner(owner, name).ifPresent(portfolioDocument -> pe.set(portfolioEntityFromDocument(portfolioDocument.getId())));
         return null;
         }
 
-    public PortfolioEntity portfolioEntityFromDocument(String id){
-        AtomicReference<PortfolioDocument> pd = null;
-        portfolioRepository.findById(id).ifPresent(pd::set);
+ */
+
+    public PortfolioEntity portfolioEntityFromDocument(PortfolioDocument pd){
 
         PortfolioEntity portfolioEntity = new PortfolioEntity(
-                pd.get().getId(),
-                pd.get().getSymbols(),
-                pd.get().getOwner(),
-                pd.get().getName()
+                pd.getId(),
+                pd.getSymbols(),
+                pd.getOwner(),
+                pd.getName()
         );
 
         ArrayList<SymbolDocument> symbolDocuments = new ArrayList<>(portfolioEntity.getSymbols().length);
@@ -91,7 +99,7 @@ public class PortfolioManager {
     }
 
 
-    public String[] addSymbol(PortfolioEntity portfolioEntity, String symbol){
+    public void addSymbol(PortfolioEntity portfolioEntity, String symbol){
         //get the document
         PortfolioDocument portfolioDocument = portfolioRepository.findById(portfolioEntity.getId()).get();
         HashSet<String> tempSymbols = new HashSet<>(Arrays.asList(portfolioEntity.getSymbols()));
@@ -104,8 +112,6 @@ public class PortfolioManager {
         portfolioEntity.setSymbols(symbolsArray);
 
         portfolioRepository.save(portfolioDocument);
-
-        return symbolsArray;
     }
 
 

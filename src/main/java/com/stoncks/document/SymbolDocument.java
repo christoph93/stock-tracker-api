@@ -60,6 +60,26 @@ public class SymbolDocument {
         this.symbol = symbol;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public double getLastPrice() {
+        return lastPrice;
+    }
+
+    public void setLastPrice(double lastPrice) {
+        this.lastPrice = lastPrice;
+    }
+
+    public Date getLastPriceDate() {
+        return lastPriceDate;
+    }
+
+    public void setLastPriceDate(Date lastPriceDate) {
+        this.lastPriceDate = lastPriceDate;
+    }
+
     @Override
     public String toString() {
         return "Ticker{" +

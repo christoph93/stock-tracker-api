@@ -1,9 +1,12 @@
 package com.stoncks;
 
 
-import com.stoncks.document.SymbolDocument;
+import com.stoncks.document.PortfolioDocument;
 import com.stoncks.document.TransactionDocument;
 
+import com.stoncks.entity.PortfolioEntity;
+import com.stoncks.entity.PositionEntity;
+import com.stoncks.manager.PortfolioManager;
 import com.stoncks.repository.PortfolioRepository;
 import com.stoncks.repository.SymbolRepository;
 import com.stoncks.repository.TransactionRepository;
@@ -20,6 +23,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 @SpringBootApplication
@@ -47,46 +51,13 @@ public class StoncksApplication implements CommandLineRunner {
         //Upload transactions to mongodb
 
         //saveToMongo(readExcel("./transactions.xls"));
-        Thread t1 = new Thread(new TickerUpdater(transactionRepository, symbolRepository, 5, false));
+        Thread t1 = new Thread(new TickerUpdater(transactionRepository, symbolRepository, 5, true));
         t1.start();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
         Date today =  Date.from(Instant.now());
         Date todayNoTime = formatter.parse(formatter.format(today));
-
-        for(SymbolDocument t : symbolRepository.findAll()){
-            LinkedHashMap<String, Double> closingPricesStringDouble = (LinkedHashMap<String, Double>) t.getClosingPrices();
-
-            //convert to <LocalDate, Double>
-            LinkedHashMap<Date, Double> closingPricesLocalDate = new LinkedHashMap<>();
-            for(String s : closingPricesStringDouble.keySet()){
-                closingPricesLocalDate.put(formatter.parse(s), closingPricesStringDouble.get(s));
-            }
-
-            //get last price
-            ArrayList<Date> datesList = new ArrayList<>(closingPricesLocalDate.keySet());
-            Collections.sort(datesList);
-            System.out.println("Latest date for: " + t.getSymbol() + " " + datesList.get(datesList.size()-1));
-            System.out.println("Latest price: " + closingPricesLocalDate.get(datesList.get(datesList.size()-1)));
-
-
-
-
-            /* print ordered */
-            /*
-            closingPricesLocalDate.entrySet()
-                    .stream()
-                    .sorted(Map.Entry.<Date, Double>comparingByKey())
-                    .forEach( System.out::println);
-                    */
-
-        }
-
-
-
-
-
 
        /* PriceReader priceReader;
 
@@ -95,33 +66,50 @@ public class StoncksApplication implements CommandLineRunner {
             System.out.println(ticker.getSymbol() + "\n" + priceReader.getPricesAsMap());
         }*/
 
-/*
+
+       //Symbol list from transactions
+        HashSet<String> uniqueSymbols = new HashSet<>();
+
+        for(TransactionDocument td : transactionRepository.findAll()){
+            uniqueSymbols.add(td.getSymbol());
+        }
+
+        System.out.println("unique symbols from transactions");
+        System.out.println(uniqueSymbols);
+
         portfolioRepository.deleteAll();
 
-        //create portfolio
-        portfolioRepository.save(new Portfolio("MyPortfolio", new String[]{"LEVE3.SAO", "VALE3.SAO"}, "MyOwner"));
+        String[] symbols = new String[uniqueSymbols.size()];
+        uniqueSymbols.toArray(symbols);
 
-        //Update portfolio
+        System.out.println("Symbols array");
+        for(String s : symbols){
+            System.out.println(s);
+        }
+
+        String name = "Portfolio 1";
+        String owner = "Owner 1";
+
         PortfolioManager portfolioManager = new PortfolioManager(portfolioRepository);
 
-        //add a symbol
-        System.out.println(Arrays.toString(portfolioManager.addSymbol("MyPortfolio", "MyOwner", "AEFI11.SAO")));
-        //remove a symbol
-        System.out.println(Arrays.toString(portfolioManager.removeSymbol("MyPortfolio", "MyOwner", "LEVE3.SAO")));
-        //remove all symbols
-        System.out.println(portfolioManager.removeAllSymbols("MyPortfolio", "MyOwner"));
-        //add symbols as list
-        System.out.println(Arrays.toString(portfolioManager.addSymbols("MyPortfolio", "MyOwner",Arrays.asList("POMO3.SAO", "USIM3.SAO"))));
-        System.out.println(Arrays.toString(portfolioManager.addSymbols("MyPortfolio", "MyOwner",Arrays.asList("POMO3.SAO", "USIM3.SAO"))));
-        System.out.println(Arrays.toString(portfolioManager.addSymbols("MyPortfolio", "MyOwner",Arrays.asList("ITSA4.SAO", "TIET11.SAO"))));
-        //update name
-        System.out.println(portfolioManager.updateName("MyPortfolio", "MyOwner", "MyNewPortfolio"));
-        //update owner
-        System.out.println(portfolioManager.updateName("MyNewPortfolio", "MyOwner", "MyNewOwner"));
-*/
+        Optional<PortfolioDocument> opt;
+        opt = portfolioRepository.findByNameAndOwner(owner, name);
 
+        PortfolioEntity portfolioEntity;
 
+        if(opt.isPresent()){
+            portfolioEntity = portfolioManager.portfolioEntityFromDocument(opt.get());
+        } else {
+            portfolioEntity = new PortfolioEntity(symbols, name, owner);
+        }
 
+        portfolioRepository.save(portfolioEntity.asDocument());
+
+        portfolioManager.calculatePositions(portfolioEntity);
+
+        for(PositionEntity pe : portfolioEntity.getPositions()){
+            System.out.println(pe.toString());
+        }
 
 
     }

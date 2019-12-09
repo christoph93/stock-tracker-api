@@ -9,6 +9,7 @@ import com.stoncks.io.TickerFromUrl;
 import com.stoncks.repository.SymbolRepository;
 import com.stoncks.repository.TransactionRepository;
 
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -56,7 +57,7 @@ public class TickerUpdater implements Runnable {
         return Arrays.copyOf(symbolsFromTrans.toArray(), symbolsFromTrans.toArray().length, String[].class);
     }
 
-    private void updateFromTransactions(boolean onlyMissingSymbols) throws InterruptedException {
+    private void updateFromTransactions(boolean onlyMissingSymbols) throws InterruptedException, ParseException {
 
         long firstReq = 0;
         int reqCount = 0;
@@ -116,7 +117,7 @@ public class TickerUpdater implements Runnable {
         System.out.println("Starting TickerUpdater thread");
         try {
             updateFromTransactions(this.onlyMissingSymbols);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ParseException e) {
             e.printStackTrace();
         }
         System.out.println("Ending TickerUpdater thread");

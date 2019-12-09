@@ -1,7 +1,7 @@
 package com.stoncks.entity;
 
+import com.stoncks.document.PortfolioDocument;
 import com.stoncks.document.SymbolDocument;
-import com.stoncks.document.TransactionDocument;
 
 import java.util.ArrayList;
 
@@ -20,6 +20,20 @@ public class PortfolioEntity {
         this.owner = owner;
         this.id = id;
     }
+
+    public PortfolioEntity(String[] symbols, String name, String owner) {
+        this.symbols = symbols;
+        this.name = name;
+        this.owner = owner;
+    }
+
+    public PortfolioDocument asDocument(){
+        PortfolioDocument pe = new PortfolioDocument(this.name, this.owner);
+        pe.setSymbols(this.symbols);
+        pe.setId(this.id);
+        return pe;
+    }
+
 
     public ArrayList<PositionEntity> getPositions() {
         return positions;
