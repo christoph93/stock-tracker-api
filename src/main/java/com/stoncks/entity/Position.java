@@ -8,8 +8,9 @@ public class Position {
 
 
     private String symbol, portfolioId;
-    public double avgBuyPrice, avgSellPrice, unitsBought, unitsSold, totalPositionBought, totalPositionSold, netProfit, profitPercent,openPositionValue, openPosition;
-    List<Transaction> transactions;
+    public double avgBuyPrice, avgSellPrice, totalUnitsBought, totalUnitsSold, totalPositionBought, totalPositionSold, profitFromSales,
+            profitPercent, openPositionValue, currentOwnedUnits, openPositionProfit, currentPrice;
+    transient List<Transaction> transactions;
     public String state;
 
     public Position(String symbol, String portfolioId) {
@@ -17,12 +18,12 @@ public class Position {
         this.portfolioId = portfolioId;
     }
 
-    public double getNetProfit() {
-        return netProfit;
+    public double getProfitFromSales() {
+        return profitFromSales;
     }
 
-    public void setNetProfit(double netProfit) {
-        this.netProfit = netProfit;
+    public void setProfitFromSales(double profitFromSales) {
+        this.profitFromSales = profitFromSales;
     }
 
     public double getProfitPercent() {
@@ -41,20 +42,20 @@ public class Position {
         this.portfolioId = portfolioId;
     }
 
-    public double getUnitsBought() {
-        return unitsBought;
+    public double getTotalUnitsBought() {
+        return totalUnitsBought;
     }
 
-    public void setUnitsBought(double unitsBought) {
-        this.unitsBought = unitsBought;
+    public void setTotalUnitsBought(double totalUnitsBought) {
+        this.totalUnitsBought = totalUnitsBought;
     }
 
-    public double getUnitsSold() {
-        return unitsSold;
+    public double getTotalUnitsSold() {
+        return totalUnitsSold;
     }
 
-    public void setUnitsSold(double unitsSold) {
-        this.unitsSold = unitsSold;
+    public void setTotalUnitsSold(double totalUnitsSold) {
+        this.totalUnitsSold = totalUnitsSold;
     }
 
     public double getTotalPositionBought() {
@@ -113,14 +114,15 @@ public class Position {
                 ", portfolioId='" + portfolioId + '\'' +
                 ", avgBuyPrice=" + avgBuyPrice +
                 ", avgSellPrice=" + avgSellPrice +
-                ", unitsBought=" + unitsBought +
-                ", unitsSold=" + unitsSold +
+                ", totalUnitsBought=" + totalUnitsBought +
+                ", totalUnitsSold=" + totalUnitsSold +
                 ", totalPositionBought=" + totalPositionBought +
                 ", totalPositionSold=" + totalPositionSold +
-                ", netProfit=" + netProfit +
+                ", profitFromSales=" + profitFromSales +
                 ", profitPercent=" + profitPercent +
                 ", openPositionValue=" + openPositionValue +
-                ", openPosition=" + openPosition +
+                ", currentOwnedUnits=" + currentOwnedUnits +
+                ", transactions=" + transactions +
                 ", state='" + state + '\'' +
                 '}';
     }

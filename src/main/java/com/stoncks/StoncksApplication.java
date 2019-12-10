@@ -1,6 +1,8 @@
 package com.stoncks;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.stoncks.document.Portfolio;
 import com.stoncks.document.Transaction;
 
@@ -48,7 +50,7 @@ public class StoncksApplication implements CommandLineRunner {
 
         //Upload transactions to mongodb
 
-        //saveToMongo(readExcel("./transactions.xls"));
+        saveToMongo(readExcel("./transactions.xls"));
         Thread t1 = new Thread(new TickerUpdater(transactionRepository, symbolRepository, 5, true));
         t1.start();
 
@@ -85,7 +87,7 @@ public class StoncksApplication implements CommandLineRunner {
             System.out.println(s);
         }
 
-
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         String name = "Portfolio 1";
         String owner = "Owner 1";
@@ -98,7 +100,7 @@ public class StoncksApplication implements CommandLineRunner {
         portfolioManager.generatePositions(testPortfolio);
 
         for(Position position : testPortfolio.getPositions()){
-                System.out.println(position);
+                System.out.println(gson.toJson(position));
             }
 
 

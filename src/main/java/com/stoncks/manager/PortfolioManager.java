@@ -9,9 +9,7 @@ import com.stoncks.repository.PortfolioRepository;
 import com.stoncks.repository.SymbolRepository;
 import com.stoncks.repository.TransactionRepository;
 
-import javax.sound.sampled.Port;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -114,30 +112,40 @@ public class PortfolioManager {
             //calculate avgs and profits from transactions
             for(Transaction transaction : position.getTransactions()){
                 if(transaction.getOperation().equals("C")){
-                    position.unitsBought+= transaction.getQuantity();
+                    position.totalUnitsBought += transaction.getQuantity();
                     position.totalPositionBought+=transaction.getTotalPrice();
                 } else if (transaction.getOperation().equals("V")){
-                    position.unitsSold+=transaction.getQuantity();
+                    position.totalUnitsSold +=transaction.getQuantity();
                     position.totalPositionSold+=transaction.getTotalPrice();
                 }
             }
 
-            position.avgBuyPrice = position.totalPositionBought/position.unitsBought;
+            position.avgBuyPrice = position.totalPositionBought/position.totalUnitsBought;
 
-            if(position.unitsSold != 0){
-                position.avgSellPrice = position.totalPositionSold/position.unitsSold;
+            if(position.totalUnitsSold != 0){
+                position.avgSellPrice = position.totalPositionSold/position.totalUnitsSold;
             } else {
                 position.avgSellPrice = 0;
             }
 
-            position.openPosition = position.unitsBought - position.unitsSold;
+            position.currentOwnedUnits = position.totalUnitsBought - position.totalUnitsSold;
 
             Symbol tempSymbol = symbolRepository.findBySymbol(position.getSymbol()).get();
 
-            position.openPositionValue = (position.openPosition*tempSymbol.getLastPrice()) -(position.openPosition*position.avgBuyPrice);
+            position.currentPrice = tempSymbol.getLastPrice();
 
+            position.openPositionValue = (position.currentOwnedUnits * position.currentPrice);
 
+            position.openPositionProfit = (tempSymbol.getLastPrice() * position.currentOwnedUnits) - (position.avgBuyPrice * position.currentOwnedUnits);
 
+            if(position.currentOwnedUnits == 0) {
+                position.state = "CLOSED";
+            }  else {
+                position.state = "OPEN";
+            }
+
+            position.profitFromSales = (position.totalUnitsSold * position.avgSellPrice) - (position.totalUnitsSold * position.avgBuyPrice);
+            position.profitPercent = ((position.openPositionProfit + position.profitFromSales))/(position.totalPositionBought) * 100;
         }
 
 
