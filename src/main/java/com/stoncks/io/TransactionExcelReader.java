@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class ExcelReader {
+public class TransactionExcelReader {
 
     //private String file = "/home/mx/IdeaProjects/stoncks/transactions";
 

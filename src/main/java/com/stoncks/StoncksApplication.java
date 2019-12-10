@@ -11,7 +11,7 @@ import com.stoncks.manager.PortfolioManager;
 import com.stoncks.repository.PortfolioRepository;
 import com.stoncks.repository.SymbolRepository;
 import com.stoncks.repository.TransactionRepository;
-import com.stoncks.io.ExcelReader;
+import com.stoncks.io.TransactionExcelReader;
 import com.stoncks.service.TickerUpdater;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -115,7 +115,7 @@ public class StoncksApplication implements CommandLineRunner {
         String line = "";
         ArrayList<Transaction> transactions = new ArrayList<>();
 
-        ExcelReader er = new ExcelReader();
+        TransactionExcelReader er = new TransactionExcelReader();
 
         System.out.println("Calling readFile");
 
