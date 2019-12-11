@@ -99,6 +99,9 @@ public class PortfolioManager {
     /*
     For each symbol in this portfolio, calculate the profit/loss and add dividends, avgPrice, etc
      */
+    /*
+    ##TODO: Implement symbol aliases e.g: AEFI11 -> RBED11.
+     */
     public void generatePositions (Portfolio portfolio){
         ArrayList<Symbol> symbols = new ArrayList<>();
         for(String s : portfolio.getSymbols()) {
