@@ -14,7 +14,7 @@ public class Symbol {
     private Object fullContent;
     private Object closingPrices;
     private Date createDate;
-    private String symbol;
+    private String symbol, alias;
     private double lastPrice;
     private Date lastPriceDate;
 
@@ -22,6 +22,15 @@ public class Symbol {
         this.fullContent = fullContent;
         this.createDate = createDate;
         this.symbol = symbol;
+        this.alias = symbol;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     public String getId() {

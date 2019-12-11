@@ -3,19 +3,13 @@ package com.stoncks;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.stoncks.document.Dividend;
-import com.stoncks.document.Portfolio;
-import com.stoncks.document.Transaction;
+import com.stoncks.document.*;
 
 import com.stoncks.entity.Position;
 import com.stoncks.io.DividendExcelReader;
 import com.stoncks.manager.PortfolioManager;
-import com.stoncks.repository.DividendRepository;
-import com.stoncks.repository.PortfolioRepository;
-import com.stoncks.repository.SymbolRepository;
-import com.stoncks.repository.TransactionRepository;
+import com.stoncks.repository.*;
 import com.stoncks.io.TransactionExcelReader;
-import com.stoncks.service.TickerUpdater;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +38,9 @@ public class StoncksApplication implements CommandLineRunner {
     @Autowired
     private DividendRepository dividendRepository;
 
+    @Autowired
+    private AliasRepository aliasRepository;
+
     public static void main(String[] args) {
         SpringApplication.run(StoncksApplication.class, args);
     }
@@ -60,6 +57,8 @@ public class StoncksApplication implements CommandLineRunner {
         //saveDividendsToMongo(readDividendsExcel("./dividends.xls"));
         //Thread t1 = new Thread(new TickerUpdater(transactionRepository, symbolRepository, 5, true));
         //t1.start();
+
+        updateAliases();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
@@ -204,6 +203,52 @@ public class StoncksApplication implements CommandLineRunner {
 
         for (Dividend d : dividendRepository.findAll()) {
             System.out.println(d);
+        }
+    }
+
+
+
+    public void updateAliases(){
+        List<Alias> aliases = aliasRepository.findAll();
+        Optional<Symbol> optSymbol;
+        Symbol symbol;
+
+        for(Alias alias : aliases){
+
+            //update symbols
+            optSymbol = symbolRepository.findBySymbol(alias.getSymbol());
+
+            if(optSymbol.isPresent()){
+                symbol = optSymbol.get();
+                symbol.setAlias(alias.getAlias());
+            } else {
+                System.out.println("Symbol not found for alias " + alias.getAlias());
+            }
+
+
+            //update transactions
+            Optional<List<Transaction>> optionalTransactions = transactionRepository.findBySymbol(alias.getSymbol());
+            List<Transaction> transactions;
+            if(optionalTransactions.isPresent()){
+                transactions = optionalTransactions.get();
+                for(Transaction transaction : transactions){
+                    transaction.setAlias(alias.getAlias());
+                }
+                transactionRepository.saveAll(transactions);
+            }
+
+
+            //update dividends
+            Optional<List<Dividend>> optionalDividends = dividendRepository.findBySymbol(alias.getSymbol());
+            List<Dividend> dividends;
+            if(optionalDividends.isPresent()){
+                dividends = optionalDividends.get();
+                for(Dividend dividend : dividends){
+                    dividend.setAlias(alias.getAlias());
+                }
+                dividendRepository.saveAll(dividends);
+            }
+
         }
     }
 

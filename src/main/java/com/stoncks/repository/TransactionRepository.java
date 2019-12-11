@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface TransactionRepository extends MongoRepository<Transaction, String>{
 
 
+    Optional<List<Transaction>> findByAlias(String alias);
     Optional<List<Transaction>> findBySymbol(String symbol);
 
 

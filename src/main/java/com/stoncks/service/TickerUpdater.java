@@ -103,6 +103,9 @@ public class TickerUpdater implements Runnable {
             //outputsize: full or compact
             Symbol temp = tfu.getTicker(currentSymbol,"compact");
 
+
+
+
             PriceReader pr = new PriceReader(temp, "Time Series (Daily)");
 
             System.out.println("Saving Ticker " + temp.getSymbol());

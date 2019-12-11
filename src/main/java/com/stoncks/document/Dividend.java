@@ -13,13 +13,14 @@ public class Dividend {
     @Id
     private String id;
 
-    private String symbol, description;
+    private String symbol, description, alias;
     private Date payDate;
     private double grossValue, taxValue, netValue;
 
 
     public Dividend(Date payDate, String description, String symbol, double grossValue, double taxValue, double netValue) {
         this.symbol = symbol;
+        this.alias = symbol;
         this.description = description;
         this.payDate = payDate;
         this.grossValue = grossValue;
@@ -27,6 +28,13 @@ public class Dividend {
         this.netValue = netValue;
     }
 
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
 
     public String getId() {
         return id;

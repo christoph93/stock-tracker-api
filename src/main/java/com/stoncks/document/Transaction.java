@@ -15,7 +15,7 @@ public class Transaction {
     private String id;
     private Date transactionDate;
     private String operation;
-    private String symbol;
+    private String symbol, alias;
     private String description;
     private double quantity;
     private double price;
@@ -27,11 +27,24 @@ public class Transaction {
         this.transactionDate = transactionDate;
         this.operation = operation;
         this.symbol = symbol;
+        this.alias = symbol;
         this.description = description;
         this.quantity = quantity;
         this.price = price;
         this.totalPrice = totalPrice;
         this.recordCreateDate = recordCreateDate;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     public String getId() {
