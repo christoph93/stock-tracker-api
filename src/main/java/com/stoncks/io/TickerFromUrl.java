@@ -28,14 +28,14 @@ public class TickerFromUrl {
         String urlString = "https://www.alphavantage.co/query?function="+ timeSerires + "&symbol=" + symbol + "&outputsize=" + outputSize + "&apikey=" + apiKey;
         System.out.println(urlString);
 
-        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("websurfing1-htl1.esi.adp.com", Integer.parseInt("8080")));
+        /*Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("websurfing1-htl1.esi.adp.com", Integer.parseInt("8080")));
         Authenticator authenticator = new Authenticator() {
 
             public PasswordAuthentication getPasswordAuthentication() {
                 return (new PasswordAuthentication("ccalifi", "27.0tres.9tresA5".toCharArray()));
             }
         };
-        Authenticator.setDefault(authenticator);
+        Authenticator.setDefault(authenticator);*/
 
         //ESI proxy
         /*
@@ -51,8 +51,8 @@ public class TickerFromUrl {
 
         try {
             URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection(proxy);
-            //HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            //HttpURLConnection conn = (HttpURLConnection) url.openConnection(proxy);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
 

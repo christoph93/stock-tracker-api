@@ -9,7 +9,7 @@ public class Position {
 
     private String symbol, portfolioId;
     public double avgBuyPrice, avgSellPrice, totalUnitsBought, totalUnitsSold, totalPositionBought, totalPositionSold, profitFromSales,
-            profitPercent, openPositionValue, currentOwnedUnits, openPositionProfit, currentPrice;
+            profitPercent, openPositionValue, currentOwnedUnits, openPositionProfit, currentPrice, totalDividends = 0;
     transient List<Transaction> transactions;
     public String state;
 

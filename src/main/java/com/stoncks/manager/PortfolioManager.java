@@ -1,14 +1,20 @@
 
 package com.stoncks.manager;
 
+import com.stoncks.document.Dividend;
 import com.stoncks.document.Portfolio;
 import com.stoncks.document.Symbol;
 import com.stoncks.document.Transaction;
 import com.stoncks.entity.Position;
+import com.stoncks.repository.DividendRepository;
 import com.stoncks.repository.PortfolioRepository;
 import com.stoncks.repository.SymbolRepository;
 import com.stoncks.repository.TransactionRepository;
 
+import javax.sound.sampled.Port;
+import java.sql.Array;
+import java.sql.Date;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,11 +24,13 @@ public class PortfolioManager {
     private PortfolioRepository portfolioRepository;
     private SymbolRepository symbolRepository;
     private TransactionRepository transactionRepository;
+    private DividendRepository dividendRepository;
 
-    public PortfolioManager(PortfolioRepository portfolioRepository, SymbolRepository symbolRepository, TransactionRepository transactionRepository) {
+    public PortfolioManager(PortfolioRepository portfolioRepository, SymbolRepository symbolRepository, TransactionRepository transactionRepository, DividendRepository dividendRepository) {
         this.portfolioRepository = portfolioRepository;
         this.symbolRepository = symbolRepository;
         this.transactionRepository = transactionRepository;
+        this.dividendRepository = dividendRepository;
     }
 
 
@@ -88,6 +96,9 @@ public class PortfolioManager {
     }
 
 
+    /*
+    For each symbol in this portfolio, calculate the profit/loss and add dividends, avgPrice, etc
+     */
     public void generatePositions (Portfolio portfolio){
         ArrayList<Symbol> symbols = new ArrayList<>();
         for(String s : portfolio.getSymbols()) {
@@ -107,6 +118,7 @@ public class PortfolioManager {
 
         //load transactions for each position
         for(Position position : portfolio.getPositions()) {
+
             transactionRepository.findBySymbol(position.getSymbol().replace(".SAO", "") ).ifPresent(position::setTransactions);
 
             //calculate avgs and profits from transactions
@@ -136,8 +148,6 @@ public class PortfolioManager {
 
             position.openPositionValue = (position.currentOwnedUnits * position.currentPrice);
 
-            position.openPositionProfit = (tempSymbol.getLastPrice() * position.currentOwnedUnits) - (position.avgBuyPrice * position.currentOwnedUnits);
-
             if(position.currentOwnedUnits == 0) {
                 position.state = "CLOSED";
             }  else {
@@ -145,12 +155,44 @@ public class PortfolioManager {
             }
 
             position.profitFromSales = (position.totalUnitsSold * position.avgSellPrice) - (position.totalUnitsSold * position.avgBuyPrice);
+
+            //dividends
+            java.util.Date today =  java.util.Date.from(Instant.now());
+            List<Dividend> dividends;
+
+            Optional<List<Dividend>> opt = dividendRepository.findBySymbolAndPayDateBefore(tempSymbol.getSymbol().replace(".SAO", ""), today);
+            //Optional<List<Dividend>> opt = dividendRepository.findBySymbol(tempSymbol.getSymbol().replace(".SAO", ""));
+
+            if(opt.isPresent()){
+                dividends = opt.get();
+            } else {
+                return;
+            }
+            System.out.println("Dividends for " + tempSymbol.getSymbol() + ": " + dividends);
+
+            for(Dividend d : dividends){
+                position.totalDividends += d.getNetValue();
+            }
+
+            position.openPositionProfit = (tempSymbol.getLastPrice() * position.currentOwnedUnits) - (position.avgBuyPrice * position.currentOwnedUnits) + position.totalDividends;
             position.profitPercent = ((position.openPositionProfit + position.profitFromSales))/(position.totalPositionBought) * 100;
+
         }
 
 
     }
 
+
+
+    public void calculateTotalPortfolioProfit(Portfolio portfolio){
+
+        for (Position position : portfolio.getPositions()){
+            portfolio.totalEquity += position.totalPositionBought - position.totalPositionSold;
+            portfolio.totalProfit += position.openPositionProfit + position.totalDividends + position.profitFromSales;
+        }
+
+        portfolio.percentProfit =(portfolio.totalProfit/portfolio.totalEquity)*100;
+    }
 
 
 

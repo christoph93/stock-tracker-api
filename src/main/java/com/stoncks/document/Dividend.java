@@ -18,7 +18,7 @@ public class Dividend {
     private double grossValue, taxValue, netValue;
 
 
-    public Dividend(String symbol, String description, Date payDate, double grossValue, double taxValue, double netValue) {
+    public Dividend(Date payDate, String description, String symbol, double grossValue, double taxValue, double netValue) {
         this.symbol = symbol;
         this.description = description;
         this.payDate = payDate;

@@ -18,6 +18,8 @@ public class Portfolio {
     private HashSet<String> symbols; //list of symbols
     private ArrayList<Position> positions;
 
+    public double totalEquity, totalProfit, percentProfit;
+
 
     public Portfolio(String owner, String name) {
         this.name = name;

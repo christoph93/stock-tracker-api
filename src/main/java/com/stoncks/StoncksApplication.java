@@ -3,11 +3,14 @@ package com.stoncks;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.stoncks.document.Dividend;
 import com.stoncks.document.Portfolio;
 import com.stoncks.document.Transaction;
 
 import com.stoncks.entity.Position;
+import com.stoncks.io.DividendExcelReader;
 import com.stoncks.manager.PortfolioManager;
+import com.stoncks.repository.DividendRepository;
 import com.stoncks.repository.PortfolioRepository;
 import com.stoncks.repository.SymbolRepository;
 import com.stoncks.repository.TransactionRepository;
@@ -38,6 +41,9 @@ public class StoncksApplication implements CommandLineRunner {
     @Autowired
     private PortfolioRepository portfolioRepository;
 
+    @Autowired
+    private DividendRepository dividendRepository;
+
     public static void main(String[] args) {
         SpringApplication.run(StoncksApplication.class, args);
     }
@@ -50,21 +56,22 @@ public class StoncksApplication implements CommandLineRunner {
 
         //Upload transactions to mongodb
 
-        saveToMongo(readExcel("./transactions.xls"));
-        Thread t1 = new Thread(new TickerUpdater(transactionRepository, symbolRepository, 5, true));
-        t1.start();
+        //saveTransactionsToMongo(readTransactionsExcel("./transactions.xls"));
+        //saveDividendsToMongo(readDividendsExcel("./dividends.xls"));
+        //Thread t1 = new Thread(new TickerUpdater(transactionRepository, symbolRepository, 5, true));
+        //t1.start();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
         Date today =  Date.from(Instant.now());
         Date todayNoTime = formatter.parse(formatter.format(today));
 
-       /* PriceReader priceReader;
-
-        for(Ticker ticker : tickerRepository.findAll()){
-            priceReader = new PriceReader(ticker, "Time Series (Daily)");
-            System.out.println(ticker.getSymbol() + "\n" + priceReader.getPricesAsMap());
-        }*/
+//        PriceReader priceReader;
+//
+//        for(Ticker ticker : tickerRepository.findAll()){
+//            priceReader = new PriceReader(ticker, "Time Series (Daily)");
+//            System.out.println(ticker.getSymbol() + "\n" + priceReader.getPricesAsMap());
+//        }
 
 
        //Symbol list from transactions
@@ -92,25 +99,22 @@ public class StoncksApplication implements CommandLineRunner {
         String name = "Portfolio 1";
         String owner = "Owner 1";
 
-        PortfolioManager portfolioManager = new PortfolioManager(portfolioRepository,symbolRepository,transactionRepository);
+        PortfolioManager portfolioManager = new PortfolioManager(portfolioRepository,symbolRepository,transactionRepository, dividendRepository);
 
         Portfolio testPortfolio = portfolioManager.createPortfolio(owner, name);
 
         testPortfolio.addSymbols(Arrays.asList(symbols));
         portfolioManager.generatePositions(testPortfolio);
+        portfolioManager.calculateTotalPortfolioProfit(testPortfolio);
 
         for(Position position : testPortfolio.getPositions()){
                 System.out.println(gson.toJson(position));
             }
 
-
-
+        System.out.println(gson.toJson(testPortfolio));
     }
 
-
-
-
-    public ArrayList<Transaction> readExcel(String path) throws ParseException {
+    public ArrayList<Transaction> readTransactionsExcel(String path) throws ParseException {
         ArrayList<String[]> table;
         String line = "";
         ArrayList<Transaction> transactions = new ArrayList<>();
@@ -151,7 +155,34 @@ public class StoncksApplication implements CommandLineRunner {
     }
 
 
-    public void saveToMongo(ArrayList<Transaction> transactions){
+    public ArrayList<Dividend> readDividendsExcel(String path) throws ParseException {
+        ArrayList<String[]> table;
+        String line = "";
+        ArrayList<Dividend> dividends = new ArrayList<>();
+
+        DividendExcelReader der = new DividendExcelReader();
+
+        table = der.getTableAsArray(path);
+
+        System.out.println("Calling readFile");
+
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy", Locale.ENGLISH);
+
+        for(int i = 1; i < table.size(); i++){
+            dividends.add(new Dividend(formatter.parse(table.get(i)[0].trim()),
+                    table.get(i)[1].trim(),
+                    table.get(i)[2].trim(),
+                    Double.parseDouble(table.get(i)[3].replace("R$", "").replace(",", ".").trim()),
+                    Double.parseDouble(table.get(i)[4].replace("R$", "").replace(",", ".").trim()),
+                    Double.parseDouble(table.get(i)[5].replace("R$", "").replace(",", ".").trim())));
+        }
+
+        return dividends;
+
+    }
+
+
+    private void saveTransactionsToMongo(ArrayList<Transaction> transactions){
 
 
         transactionRepository.deleteAll();
@@ -161,6 +192,18 @@ public class StoncksApplication implements CommandLineRunner {
 
         for (Transaction t : transactionRepository.findAll()) {
             System.out.println(t);
+        }
+    }
+
+    public void saveDividendsToMongo(ArrayList<Dividend> dividends){
+
+        dividendRepository.deleteAll();
+        dividendRepository.saveAll(dividends);
+
+        System.out.println("Saved the following dividends");
+
+        for (Dividend d : dividendRepository.findAll()) {
+            System.out.println(d);
         }
     }
 

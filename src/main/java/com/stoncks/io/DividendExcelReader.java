@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,13 +19,10 @@ public class DividendExcelReader {
 
 
 
-    public ArrayList<String[]> findTableInFile(String filePath){
+    public ArrayList<String[]> getTableAsArray(String filePath){
 
         String cellVal;
         String line;
-        boolean foundTable = false;
-        int tableStartColIndex = -1;
-        int tableEndColIndex = 999;
         ArrayList<String[]> rows = new ArrayList<>();
 
         try {
@@ -43,8 +41,6 @@ public class DividendExcelReader {
                 while (cellIterator.hasNext()) {
                     Cell currentCell = cellIterator.next();
 
-                    if(currentCell.getColumnIndex() >= tableStartColIndex && currentCell.getColumnIndex() <= tableEndColIndex) {
-
                         switch (currentCell.getCellType()) {
                             case BLANK:
                                 cellVal = "--#";
@@ -59,34 +55,17 @@ public class DividendExcelReader {
                                 cellVal = " UNKNOWN";
                                 break;
                         }
-                    }
 
-                    if(cellVal.contains("Data Negócio")) {
-                        System.out.println("Found beginning of table!");
-                        tableStartColIndex = currentCell.getColumnIndex();
-                        tableEndColIndex = tableStartColIndex + 9;
-                        foundTable = true;
-                    }
 
                     line += cellVal + " ";
-
-                    if(foundTable && currentCell.getColumnIndex() ==  tableStartColIndex &&  cellVal.equals("--#")){
-                        System.out.println("Found end of table!");
-                        foundTable = false;
-                    }
                 }
-
-                if(foundTable) {
-                    String[] row = line.split("#");
-                    rows.add(row);
-                };
+                String[] row = line.split("#");
+                rows.add(row);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return rows;
-
     }
 
 
