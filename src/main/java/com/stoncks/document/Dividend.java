@@ -95,12 +95,10 @@ public class Dividend {
     @Override
     public String toString() {
         return "Dividend{" +
-                "id='" + id + '\'' +
                 ", symbol='" + symbol + '\'' +
+                ", alias='" + alias + '\'' +
                 ", description='" + description + '\'' +
                 ", payDate=" + payDate +
-                ", grossValue=" + grossValue +
-                ", taxValue=" + taxValue +
                 ", netValue=" + netValue +
                 '}';
     }

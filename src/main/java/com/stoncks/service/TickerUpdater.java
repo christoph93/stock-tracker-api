@@ -51,7 +51,7 @@ public class TickerUpdater implements Runnable {
         HashSet<String> symbolsFromTrans = new HashSet<>();
 
         for (Transaction t : transactions) {
-            symbolsFromTrans.add(t.getSymbol() + ".SAO");
+            symbolsFromTrans.add(t.getAlias() + ".SAO");
         }
 
         return Arrays.copyOf(symbolsFromTrans.toArray(), symbolsFromTrans.toArray().length, String[].class);

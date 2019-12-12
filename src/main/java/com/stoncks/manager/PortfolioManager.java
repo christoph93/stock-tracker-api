@@ -99,14 +99,11 @@ public class PortfolioManager {
     /*
     For each symbol in this portfolio, calculate the profit/loss and add dividends, avgPrice, etc
      */
-    /*
-    ##TODO: Implement symbol aliases e.g: AEFI11 -> RBED11.
-     */
     public void generatePositions (Portfolio portfolio){
         ArrayList<Symbol> symbols = new ArrayList<>();
         for(String s : portfolio.getSymbols()) {
-            System.out.println("finding symbol" + s);
-            symbolRepository.findBySymbol(s).ifPresent(symbols::add);
+            System.out.println("finding alias " + s);
+            symbolRepository.findByAlias(s).ifPresent(symbols::add);
         }
 
         ArrayList<Position> positions = new ArrayList<>();
@@ -163,7 +160,7 @@ public class PortfolioManager {
             java.util.Date today =  java.util.Date.from(Instant.now());
             List<Dividend> dividends;
 
-            Optional<List<Dividend>> opt = dividendRepository.findBySymbolAndPayDateBefore(tempSymbol.getSymbol().replace(".SAO", ""), today);
+            Optional<List<Dividend>> opt = dividendRepository.findByAliasAndPayDateBefore(tempSymbol.getSymbol().replace(".SAO", ""), today);
             //Optional<List<Dividend>> opt = dividendRepository.findBySymbol(tempSymbol.getSymbol().replace(".SAO", ""));
 
             if(opt.isPresent()){

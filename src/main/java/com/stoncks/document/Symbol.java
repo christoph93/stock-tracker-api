@@ -11,8 +11,8 @@ public class Symbol {
     @Id
     private String id;
 
-    private Object fullContent;
-    private Object closingPrices;
+    transient private Object fullContent;
+    transient private Object closingPrices;
     private Date createDate;
     private String symbol, alias;
     private double lastPrice;
@@ -91,7 +91,7 @@ public class Symbol {
 
     @Override
     public String toString() {
-        return "Ticker{" +
+        return "Symbol{" +
                 "id='" + id + '\'' +
                 ", content='" + fullContent + '\'' +
                 ", createDate=" + createDate +

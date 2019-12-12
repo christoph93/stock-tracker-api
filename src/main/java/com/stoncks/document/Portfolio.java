@@ -16,7 +16,7 @@ public class Portfolio {
     private String owner;
     private String name;
     private HashSet<String> symbols; //list of symbols
-    private ArrayList<Position> positions;
+    transient  private ArrayList<Position> positions;
 
     public double totalEquity, totalProfit, percentProfit;
 

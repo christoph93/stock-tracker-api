@@ -10,6 +10,7 @@ import com.stoncks.io.DividendExcelReader;
 import com.stoncks.manager.PortfolioManager;
 import com.stoncks.repository.*;
 import com.stoncks.io.TransactionExcelReader;
+import com.stoncks.service.TickerUpdater;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,8 @@ public class StoncksApplication implements CommandLineRunner {
     @Autowired
     private AliasRepository aliasRepository;
 
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
     public static void main(String[] args) {
         SpringApplication.run(StoncksApplication.class, args);
     }
@@ -58,7 +61,13 @@ public class StoncksApplication implements CommandLineRunner {
         //Thread t1 = new Thread(new TickerUpdater(transactionRepository, symbolRepository, 5, true));
         //t1.start();
 
+        aliasRepository.deleteAll();
+        aliasRepository.save(new Alias("AEFI11.SAO", "RBED11.SAO"));
+
         updateAliases();
+
+        TickerUpdater tu = new TickerUpdater(transactionRepository, symbolRepository, 5, false);
+        tu.run();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
@@ -80,20 +89,20 @@ public class StoncksApplication implements CommandLineRunner {
             uniqueSymbols.add(td.getSymbol()+".SAO");
         }
 
-        System.out.println("unique symbols from transactions");
-        System.out.println(uniqueSymbols);
+        /*System.out.println("unique symbols from transactions");
+        System.out.println(uniqueSymbols);*/
 
         portfolioRepository.deleteAll();
 
         String[] symbols = new String[uniqueSymbols.size()];
         uniqueSymbols.toArray(symbols);
 
-        System.out.println("Symbols array");
+        /*System.out.println("Symbols array");
         for(String s : symbols){
             System.out.println(s);
-        }
+        }*/
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        //Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         String name = "Portfolio 1";
         String owner = "Owner 1";
@@ -106,9 +115,10 @@ public class StoncksApplication implements CommandLineRunner {
         portfolioManager.generatePositions(testPortfolio);
         portfolioManager.calculateTotalPortfolioProfit(testPortfolio);
 
+        /*
         for(Position position : testPortfolio.getPositions()){
                 System.out.println(gson.toJson(position));
-            }
+            }*/
 
         System.out.println(gson.toJson(testPortfolio));
     }
@@ -209,6 +219,7 @@ public class StoncksApplication implements CommandLineRunner {
 
 
     public void updateAliases(){
+
         List<Alias> aliases = aliasRepository.findAll();
         Optional<Symbol> optSymbol;
         Symbol symbol;
@@ -221,6 +232,7 @@ public class StoncksApplication implements CommandLineRunner {
             if(optSymbol.isPresent()){
                 symbol = optSymbol.get();
                 symbol.setAlias(alias.getAlias());
+                symbolRepository.save(symbol);
             } else {
                 System.out.println("Symbol not found for alias " + alias.getAlias());
             }
