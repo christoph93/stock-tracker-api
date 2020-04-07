@@ -1,19 +1,17 @@
+package com.stocktrackerapi.manager;
 
-package com.stoncks.manager;
 
-import com.stoncks.document.Dividend;
-import com.stoncks.document.Portfolio;
-import com.stoncks.document.Symbol;
-import com.stoncks.document.Transaction;
-import com.stoncks.entity.Position;
-import com.stoncks.repository.DividendRepository;
-import com.stoncks.repository.PortfolioRepository;
-import com.stoncks.repository.SymbolRepository;
-import com.stoncks.repository.TransactionRepository;
 
-import javax.sound.sampled.Port;
-import java.sql.Array;
-import java.sql.Date;
+import com.stocktrackerapi.document.Dividend;
+import com.stocktrackerapi.document.Portfolio;
+import com.stocktrackerapi.document.Symbol;
+import com.stocktrackerapi.document.Transaction;
+import com.stocktrackerapi.entity.Position;
+import com.stocktrackerapi.repository.DividendRepository;
+import com.stocktrackerapi.repository.PortfolioRepository;
+import com.stocktrackerapi.repository.SymbolRepository;
+import com.stocktrackerapi.repository.TransactionRepository;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -160,7 +158,7 @@ public class PortfolioManager {
             java.util.Date today =  java.util.Date.from(Instant.now());
             List<Dividend> dividends;
 
-            Optional<List<Dividend>> opt = dividendRepository.findByAliasAndPayDateBefore(tempSymbol.getSymbol().replace(".SAO", ""), today);
+            Optional<List<Dividend>> opt = dividendRepository.findBySymbolAndPayDateBefore(tempSymbol.getSymbol().replace(".SAO", ""), today);
             //Optional<List<Dividend>> opt = dividendRepository.findBySymbol(tempSymbol.getSymbol().replace(".SAO", ""));
 
             if(opt.isPresent()){

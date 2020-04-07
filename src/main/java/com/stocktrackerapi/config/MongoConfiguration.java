@@ -1,18 +1,16 @@
-package com.stoncks.config;
+package com.stocktrackerapi.config;
 
-import ch.qos.logback.core.pattern.Converter;
+
+
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.convert.CustomConversions;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDateTime;
 
 @Configuration
 public class MongoConfiguration extends AbstractMongoConfiguration {

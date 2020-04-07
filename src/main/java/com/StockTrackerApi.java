@@ -1,18 +1,29 @@
-package com.stoncks;
+package com;
+
 
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.stoncks.document.*;
+import com.stocktrackerapi.document.Alias;
+import com.stocktrackerapi.document.Dividend;
+import com.stocktrackerapi.document.Portfolio;
+import com.stocktrackerapi.document.Symbol;
+import com.stocktrackerapi.document.Transaction;
+import com.stocktrackerapi.io.DividendExcelReader;
+import com.stocktrackerapi.io.TransactionExcelReader;
+import com.stocktrackerapi.manager.PortfolioManager;
+import com.stocktrackerapi.repository.AliasRepository;
+import com.stocktrackerapi.repository.DividendRepository;
+import com.stocktrackerapi.repository.PortfolioRepository;
+import com.stocktrackerapi.repository.SymbolRepository;
+import com.stocktrackerapi.repository.TransactionRepository;
+import com.stocktrackerapi.service.TickerUpdater;
+import com.stocktrackerapi.util.SymbolUtils;
 
-import com.stoncks.entity.Position;
-import com.stoncks.io.DividendExcelReader;
-import com.stoncks.manager.PortfolioManager;
-import com.stoncks.repository.*;
-import com.stoncks.io.TransactionExcelReader;
-import com.stoncks.service.TickerUpdater;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -23,9 +34,10 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 
+@EnableMongoRepositories
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 @SpringBootApplication
-public class StoncksApplication implements CommandLineRunner {
+public class StockTrackerApi implements CommandLineRunner {
 
     @Autowired
     private TransactionRepository transactionRepository;
@@ -41,11 +53,13 @@ public class StoncksApplication implements CommandLineRunner {
 
     @Autowired
     private AliasRepository aliasRepository;
+    
+    private SymbolUtils symbolsUtils;
 
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public static void main(String[] args) {
-        SpringApplication.run(StoncksApplication.class, args);
+        SpringApplication.run(StockTrackerApi.class, args);
     }
 
     public static String API_KEY =  "N6UZN5PBXVO599CV";
@@ -53,6 +67,8 @@ public class StoncksApplication implements CommandLineRunner {
     @Override
     @SuppressWarnings("unchecked")
     public void run(String[] args) throws Exception {
+    	
+    	symbolsUtils = new SymbolUtils(aliasRepository, symbolRepository);
 
         //Upload transactions to mongodb
 
@@ -64,10 +80,12 @@ public class StoncksApplication implements CommandLineRunner {
         aliasRepository.deleteAll();
         aliasRepository.save(new Alias("AEFI11.SAO", "RBED11.SAO"));
 
-        updateAliases();
+        int updatedSymbolsFromAliases = symbolsUtils.updateSymbolsFromAliases();
+        
+        System.out.println("Updated " + updatedSymbolsFromAliases + " symbols from aliases");
 
-        TickerUpdater tu = new TickerUpdater(transactionRepository, symbolRepository, 5, false);
-        tu.run();
+//        TickerUpdater tu = new TickerUpdater(transactionRepository, symbolRepository, 5, false);
+//        tu.run();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
@@ -84,18 +102,28 @@ public class StoncksApplication implements CommandLineRunner {
 
        //Symbol list from transactions
         HashSet<String> uniqueSymbols = new HashSet<>();
-
-        for(Transaction td : transactionRepository.findAll()){
-            uniqueSymbols.add(td.getSymbol()+".SAO");
+        
+        for(Transaction transaction : transactionRepository.findAll()){
+            uniqueSymbols.add(transaction.getSymbol());
         }
+        
+        
+//        HashSet<String> uniqueAliases = new HashSet<>();
+//        //get the unique aliases from the unique symbol list
+//        for(String symbol : uniqueSymbols) {
+//        	uniqueAliases.add(symbolsUtils.getAliasFromSymbol(symbol));
+//        }
 
-        /*System.out.println("unique symbols from transactions");
-        System.out.println(uniqueSymbols);*/
+        System.out.println("unique symbols from transactions");
+        System.out.println(uniqueSymbols);
+        
+        System.out.println("unique aliases from s");
+//        System.out.println(uniqueAliases);
 
         portfolioRepository.deleteAll();
 
-        String[] symbols = new String[uniqueSymbols.size()];
-        uniqueSymbols.toArray(symbols);
+//        String[] symbols = new String[uniqueAliases.size()];
+//        uniqueAliases.toArray(symbols);
 
         /*System.out.println("Symbols array");
         for(String s : symbols){
@@ -111,7 +139,7 @@ public class StoncksApplication implements CommandLineRunner {
 
         Portfolio testPortfolio = portfolioManager.createPortfolio(owner, name);
 
-        testPortfolio.addSymbols(Arrays.asList(symbols));
+//        testPortfolio.addSymbols(Arrays.asList(symbols));
         portfolioManager.generatePositions(testPortfolio);
         portfolioManager.calculateTotalPortfolioProfit(testPortfolio);
 
@@ -218,51 +246,7 @@ public class StoncksApplication implements CommandLineRunner {
 
 
 
-    public void updateAliases(){
 
-        List<Alias> aliases = aliasRepository.findAll();
-        Optional<Symbol> optSymbol;
-        Symbol symbol;
-
-        for(Alias alias : aliases){
-
-            //update symbols
-            optSymbol = symbolRepository.findBySymbol(alias.getSymbol());
-
-            if(optSymbol.isPresent()){
-                symbol = optSymbol.get();
-                symbol.setAlias(alias.getAlias());
-                symbolRepository.save(symbol);
-            } else {
-                System.out.println("Symbol not found for alias " + alias.getAlias());
-            }
-
-
-            //update transactions
-            Optional<List<Transaction>> optionalTransactions = transactionRepository.findBySymbol(alias.getSymbol());
-            List<Transaction> transactions;
-            if(optionalTransactions.isPresent()){
-                transactions = optionalTransactions.get();
-                for(Transaction transaction : transactions){
-                    transaction.setAlias(alias.getAlias());
-                }
-                transactionRepository.saveAll(transactions);
-            }
-
-
-            //update dividends
-            Optional<List<Dividend>> optionalDividends = dividendRepository.findBySymbol(alias.getSymbol());
-            List<Dividend> dividends;
-            if(optionalDividends.isPresent()){
-                dividends = optionalDividends.get();
-                for(Dividend dividend : dividends){
-                    dividend.setAlias(alias.getAlias());
-                }
-                dividendRepository.saveAll(dividends);
-            }
-
-        }
-    }
 
 
 }

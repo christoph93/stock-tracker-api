@@ -1,8 +1,10 @@
-package com.stoncks.entity;
+package com.stocktrackerapi.entity;
 
-import com.stoncks.document.Transaction;
+
 
 import java.util.List;
+
+import com.stocktrackerapi.document.Transaction;
 
 public class Position {
 

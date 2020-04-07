@@ -1,5 +1,4 @@
-package com.stoncks.document;
-
+package com.stocktrackerapi.document;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -7,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
 
 
-@Document
+
 public class Transaction {
 
 
@@ -15,7 +14,7 @@ public class Transaction {
     private String id;
     private Date transactionDate;
     private String operation;
-    private String symbol, alias;
+    private String symbol;
     private String description;
     private double quantity;
     private double price;
@@ -26,8 +25,7 @@ public class Transaction {
     public Transaction(Date transactionDate, String operation, String symbol, String description, double quantity, double price, double totalPrice, Date recordCreateDate) {
         this.transactionDate = transactionDate;
         this.operation = operation;
-        this.symbol = symbol;
-        this.alias = symbol;
+        this.symbol = symbol;        
         this.description = description;
         this.quantity = quantity;
         this.price = price;
@@ -37,14 +35,6 @@ public class Transaction {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
     }
 
     public String getId() {

@@ -1,18 +1,20 @@
-package com.stoncks.service;
+package com.stocktrackerapi.service;
 
 
-import com.stoncks.StoncksApplication;
-import com.stoncks.document.Symbol;
-import com.stoncks.document.Transaction;
-import com.stoncks.io.PriceReader;
-import com.stoncks.io.TickerFromUrl;
-import com.stoncks.repository.SymbolRepository;
-import com.stoncks.repository.TransactionRepository;
+
 
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+
+import com.StockTrackerApi;
+import com.stocktrackerapi.document.Symbol;
+import com.stocktrackerapi.document.Transaction;
+import com.stocktrackerapi.io.PriceReader;
+import com.stocktrackerapi.io.TickerFromUrl;
+import com.stocktrackerapi.repository.SymbolRepository;
+import com.stocktrackerapi.repository.TransactionRepository;
 
 public class TickerUpdater implements Runnable {
 
@@ -51,7 +53,7 @@ public class TickerUpdater implements Runnable {
         HashSet<String> symbolsFromTrans = new HashSet<>();
 
         for (Transaction t : transactions) {
-            symbolsFromTrans.add(t.getAlias() + ".SAO");
+            symbolsFromTrans.add(t.getSymbol());
         }
 
         return Arrays.copyOf(symbolsFromTrans.toArray(), symbolsFromTrans.toArray().length, String[].class);
@@ -71,7 +73,7 @@ public class TickerUpdater implements Runnable {
 
         System.out.println(Arrays.toString(symbolsToUpdate));
 
-        TickerFromUrl tfu = new TickerFromUrl("TIME_SERIES_DAILY", StoncksApplication.API_KEY);
+        TickerFromUrl tfu = new TickerFromUrl("TIME_SERIES_DAILY", StockTrackerApi.API_KEY);
 
         for(String currentSymbol : symbolsToUpdate){
 

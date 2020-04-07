@@ -1,4 +1,6 @@
-package com.stoncks.document;
+package com.stocktrackerapi.document;
+
+
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

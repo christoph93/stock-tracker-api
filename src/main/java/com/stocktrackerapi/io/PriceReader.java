@@ -1,9 +1,11 @@
-package com.stoncks.io;
+package com.stocktrackerapi.io;
+
+
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.stoncks.document.Symbol;
+import com.stocktrackerapi.document.Symbol;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

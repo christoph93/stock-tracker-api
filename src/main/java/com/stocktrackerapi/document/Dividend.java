@@ -1,39 +1,26 @@
-package com.stoncks.document;
+package com.stocktrackerapi.document;
 
-import com.stoncks.entity.Position;
 import org.springframework.data.annotation.Id;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 
 public class Dividend {
 
     @Id
     private String id;
 
-    private String symbol, description, alias;
+    private String symbol, description;
     private Date payDate;
     private double grossValue, taxValue, netValue;
 
 
     public Dividend(Date payDate, String description, String symbol, double grossValue, double taxValue, double netValue) {
-        this.symbol = symbol;
-        this.alias = symbol;
+        this.symbol = symbol;        
         this.description = description;
         this.payDate = payDate;
         this.grossValue = grossValue;
         this.taxValue = taxValue;
         this.netValue = netValue;
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
     }
 
     public String getId() {
@@ -96,7 +83,6 @@ public class Dividend {
     public String toString() {
         return "Dividend{" +
                 ", symbol='" + symbol + '\'' +
-                ", alias='" + alias + '\'' +
                 ", description='" + description + '\'' +
                 ", payDate=" + payDate +
                 ", netValue=" + netValue +

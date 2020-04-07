@@ -1,8 +1,10 @@
-package com.stoncks.io;
+package com.stocktrackerapi.io;
+
+
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.stoncks.document.Symbol;
+import com.stocktrackerapi.document.Symbol;
 
 import java.io.IOException;
 

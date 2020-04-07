@@ -1,21 +1,24 @@
-package com.stoncks.repository;
+package com.stocktrackerapi.repository;
 
-import com.stoncks.document.Dividend;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import com.stocktrackerapi.document.Dividend;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+
+@Repository
 public interface DividendRepository extends MongoRepository<Dividend, String>{
 
 
-    Optional<List<Dividend>> findByAlias(String alias);
     Optional<List<Dividend>> findBySymbol(String symbol);
 
     @Query("{ 'symbol' : ?0 , 'payDate' : { $lt : ?1} }")
-    Optional<List<Dividend>> findByAliasAndPayDateBefore(String symbol, Date payDate);
+    Optional<List<Dividend>> findBySymbolAndPayDateBefore(String symbol, Date payDate);
 
 
     }

@@ -1,10 +1,12 @@
-package com.stoncks.document;
+package com.stocktrackerapi.document;
 
-import com.stoncks.entity.Position;
+
+
 import org.springframework.data.annotation.Id;
 
+import com.stocktrackerapi.entity.Position;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 

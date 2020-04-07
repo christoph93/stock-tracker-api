@@ -1,4 +1,5 @@
-package com.stoncks.io;
+package com.stocktrackerapi.io;
+
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -81,6 +82,8 @@ public class TransactionExcelReader {
                     rows.add(row);
                 };
             }
+            
+            workbook.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

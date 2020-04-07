@@ -1,12 +1,16 @@
-package com.stoncks.repository;
+package com.stocktrackerapi.repository;
 
-import com.stoncks.document.Portfolio;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import com.stocktrackerapi.document.Portfolio;
 
 import java.util.List;
 import java.util.Optional;
 
+
+@Repository
 public interface PortfolioRepository extends MongoRepository<Portfolio, String> {
 
 

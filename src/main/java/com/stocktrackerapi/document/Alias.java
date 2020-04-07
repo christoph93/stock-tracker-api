@@ -1,11 +1,23 @@
-package com.stoncks.document;
+package com.stocktrackerapi.document;
+
+import java.util.Date;
 
 public class Alias {
 
 
-    private String symbol, alias;
+    private String symbol;
+    private String alias;
+    private Date createDate;
 
-    public Alias(String symbol, String alias) {
+    public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Alias(String symbol, String alias) {
         this.symbol = symbol;
         this.alias = alias;
     }
@@ -25,4 +37,6 @@ public class Alias {
     public void setAlias(String alias) {
         this.alias = alias;
     }
+    
+    
 }
